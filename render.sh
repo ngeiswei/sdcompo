@@ -1,8 +1,8 @@
 #!/bin/bash
 
-if [[ $# != 1 ]]; then
+if [[ $# != 1 && $# != 2 ]]; then
     echo "Error: wrong usage"
-    echo "Usage: $0 ROUND"
+    echo "Usage: $0 ROUND [AUTHOR]"
 fi
 
 ##############
@@ -10,6 +10,7 @@ fi
 ##############
 
 ROUND=$1
+AUTHOR=$2
 ENTRY_DIR="../Entries"
 METADATA="metadata_rnd_1_to_75.csv"
 
@@ -178,3 +179,42 @@ get_value() {
 ########
 # Main #
 ########
+
+while read row; do
+    row_round=$(get_value "$row" round)
+    row_author=$(get_value "$row" author)
+
+    # If the round doesn't match, or the author doesn't match (if
+    # provided), skip that turn
+    if [[ $row_round != $ROUND || ( $AUTHOR && $row_author != $AUTHOR ) ]]; then
+        continue
+    fi
+
+    # Get the rest of the metadata
+    row_year=$(get_value "$row" year)
+    row_place=$(get_value "$row" place)
+    row_title="$(get_value "$row" title)"
+    row_filename="$(get_value "$row" filename)"
+
+    # Unpack the entry into a temporary directory
+    tmp_dir="$(unpack "$row_filename")"
+
+    # Launch tracker. The user should save a wav file of the
+    # render entitled render.wav, in the same temporary directory
+    eval $(find_unpacked_entry $tmp_dir)
+        
+    # Normalize and convert to the right format
+    # TODO DC offset
+    sox --norm -b 16 -r 44100 "$tmp_dir/render.wav" "$tmp_dir/render_fmt.wav"
+
+    # Encode in flac with the tags
+    pad_rnd=$(pad $row_round 3)
+    track_num=                  # TODO
+    ofile="$tmp_dir/SDC${pad_rnd}-${track_num}__${row_author}_-_${row_title}.flac"
+    flac "$tmp_dir/render_fmt.wav" -5 -o "$ofile" \
+        -T "Artist Name=$row_author" \
+        -T "Track Title=$row_title" \
+        -T "Album Title=SDCompo Round {pad_rnd}" \
+        -T "Year=$row_year" \
+        -T "Track Number=$track_num"
+done < $METADATA
