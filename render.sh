@@ -17,6 +17,10 @@ METADATA="metadata_rnd_1_to_75.csv"
 # Functions #
 #############
 
+warning() {
+    echo "[WARN] $@" 1>&2
+}
+
 # Given an error message, display that error on stderr and exit
 fatalError() {
     echo "[ERROR] $@" 1>&2
@@ -131,12 +135,46 @@ find_unpacked_entry() {
     it_files="$(ls $TMP_DIR/*.it)"     # Impulse Tracker
     if [[ "$xrns_files" ]]; then
         echo $(renoise_pgr "$xrns_files") "$xrns_files"
-    elif
-        TODO
+    elif [[ "$psy_files" ]]; then
+        echo $(psy_pgr "$psy_files") "$psy_files"
+    elif [[ "$it_files" ]]; then
+        echo $(it_pgr "$it_files") "$it_files"
+    else
+        fatalError "Unknown tracker files in directory $TMP_DIR"
+    fi
+}
+
+# Given
+#
+# 1) a row from a metadata CSV file
+#
+# 2) a field
+#
+# Return the value corresponding to that field. Possible fields are:
+# round, year, place, author, title, filename
+get_value() {
+    row="$1"
+    field="$2"
+    row_re='([[:digit:]]{4}),([[:digit]]+(?:st|nd|rd|th)),(.+),(".+"),(".+")'
+    if [[ $row =~ $row_re ]]; then
+        if [[ $field == year ]]; then
+            echo "${BASH_REMATCH[1]}"
+        elif [[ $field == place ]]; then
+            echo "${BASH_REMATCH[2]}"
+        elif [[ $field == author ]]; then
+            echo "${BASH_REMATCH[3]}"
+        elif [[ $field == title ]]; then
+            echo "${BASH_REMATCH[4]}"
+        elif [[ $field == filename ]]; then
+            echo "${BASH_REMATCH[5]}"
+        else
+            fatalError "Field $field is not recognized"
+        fi
+    else
+        fatalError "Row $row does not match regex $row_re"
     fi
 }
 
 ########
 # Main #
 ########
-
