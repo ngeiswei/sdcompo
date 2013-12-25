@@ -207,11 +207,8 @@ while read row; do
     row_title="$(get_value "$row" title)"
     row_filename="$(get_value "$row" filename)"
 
-    # TODO the author in the directory and the one in the metadata don't match!!!
-    # So $row_author in the metadata should be fixed
-    
     # Get the actual path
-    filename="$ENTRY_DIR/round${row_round}/$row_author/$row_filename"
+    filename="$(find "$ENTRY_DIR/round${row_round}" -name "$row_filename")"
     
     # Unpack the entry into a temporary directory
     tmp_dir="$(unpack "$filename")"
