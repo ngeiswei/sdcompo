@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# You must execute the script from its directory
+
 if [[ $# != 1 && $# != 2 ]]; then
     echo "Error: wrong usage"
     echo "Usage: $0 ROUND [AUTHOR]"
@@ -205,8 +207,14 @@ while read row; do
     row_title="$(get_value "$row" title)"
     row_filename="$(get_value "$row" filename)"
 
+    # TODO the author in the directory and the one in the metadata don't match!!!
+    # So $row_author in the metadata should be fixed
+    
+    # Get the actual path
+    filename="$ENTRY_DIR/round${row_round}/$row_author/$row_filename"
+    
     # Unpack the entry into a temporary directory
-    tmp_dir="$(unpack "$row_filename")"
+    tmp_dir="$(unpack "$filename")"
 
     # Launch tracker. The user should save a wav file of the
     # render entitled render.wav, in the same temporary directory
