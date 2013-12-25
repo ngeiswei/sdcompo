@@ -180,13 +180,22 @@ get_value() {
 # Main #
 ########
 
+track_num=-1
 while read row; do
     row_round=$(get_value "$row" round)
     row_author=$(get_value "$row" author)
 
-    # If the round doesn't match, or the author doesn't match (if
-    # provided), skip that turn
-    if [[ $row_round != $ROUND || ( $AUTHOR && $row_author != $AUTHOR ) ]]; then
+    # If the round doesn't match, skip that entry
+    if [[ $row_round != $ROUND ]]; then
+        continue
+    fi
+
+    # If the round matches then we must increase the track_num to get
+    # it right for that entry
+    ((track_num++))
+
+    # If the author doesn't match (if provided), skip that entry
+    if [[ $AUTHOR && $row_author != $AUTHOR ]]; then
         continue
     fi
 
@@ -208,9 +217,10 @@ while read row; do
     sox --norm -b 16 -r 44100 "$tmp_dir/render.wav" "$tmp_dir/render_fmt.wav"
 
     # Encode in flac with the tags
+    of_place=$(fwt_place $row_place)
+    of_title=${row_title// /_}
     pad_rnd=$(pad $row_round 3)
-    track_num=                  # TODO
-    ofile="$tmp_dir/SDC${pad_rnd}-${track_num}__${row_author}_-_${row_title}.flac"
+    ofile="$tmp_dir/SDC${pad_rnd}-${of_place}_${row_author}_-_${of_title}.flac"
     flac "$tmp_dir/render_fmt.wav" -5 -o "$ofile" \
         -T "Artist Name=$row_author" \
         -T "Track Title=$row_title" \
