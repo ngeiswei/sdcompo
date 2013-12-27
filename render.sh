@@ -208,8 +208,11 @@ while read row; do
     row_title="$(get_value "$row" title)"
     row_filename="$(get_value "$row" filename)"
 
+    # Define round directory name
+    RND="round${row_round}"
+
     # Get the actual path
-    filename="$(find "$ENTRY_DIR/round${row_round}" -name "$row_filename")"
+    filename="$(find "$ENTRY_DIR/$RND" -name "$row_filename")"
     
     # Unpack the entry into a temporary directory
     tmp_dir="$(unpack "$filename")"
@@ -222,11 +225,14 @@ while read row; do
     # TODO DC offset
     sox --norm -b 16 -r 44100 "$tmp_dir/render.wav" "$tmp_dir/render_fmt.wav"
 
-    # Encode in flac with the tags
+    # Define the output flac file
     of_place=$(fwt_place $row_place)
     of_title=${row_title// /_}
     pad_rnd=$(pad $row_round 3)
-    ofile="$tmp_dir/SDC${pad_rnd}-${of_place}_${row_author}_-_${of_title}.flac"
+    mkdir -p "$RENDERS_DIR/$RND"
+    ofile="$RENDERS_DIR/$RND/SDC${pad_rnd}-${of_place}_${row_author}_-_${of_title}.flac"
+    
+    # Encode in flac with the tags
     flac "$tmp_dir/render_fmt.wav" -5 -o "$ofile" \
         -T "Artist Name=$row_author" \
         -T "Track Title=$row_title" \
