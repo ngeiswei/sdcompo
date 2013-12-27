@@ -5,6 +5,7 @@
 if [[ $# != 1 && $# != 2 ]]; then
     echo "Error: wrong usage"
     echo "Usage: $0 ROUND [AUTHOR]"
+    exit 1
 fi
 
 ##############
