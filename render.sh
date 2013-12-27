@@ -92,19 +92,19 @@ renoise_doc_version() {
 renoise_pgr() {
     local pgr_dir="~/.wine/drive_c/Program Files (x86)"
     local doc_string="$(renoise_doc_version "$1")"
-    switch($doc_string) {
-        case 10:
-            echo "wine $pgr_dir/Renoise 1.9.1/Renoise.exe"
-            break
-        case 14:
+    case $doc_string in
+        10) echo "wine $pgr_dir/Renoise 1.9.1/Renoise.exe"
+            ;;
+        14)
             echo "wine $pgr_dir/Renoise 2.0.0/Renoise.exe"
-            break
-        case 21:
+            ;;
+        21)
             echo "wine $pgr_dir/Renoise 2.5.1/Renoise.exe"
-            break
-        default:
+            ;;
+        *)
             fatalError "doc_string $doc_string not implemented"
-    }
+            ;;
+    esac
 }
 
 # Parse an IT file and return its Cwt and Cmwt, whitespace separated.
@@ -159,18 +159,20 @@ find_unpacked_entry() {
 get_value() {
     row="$1"
     field="$2"
-    row_re='([[:digit:]]{4}),([[:digit]]+(?:st|nd|rd|th)),(.+),(".+"),(".+")'
+    row_re='([[:digit:]]+),([[:digit:]]{4}),([[:digit:]]+)(st|nd|rd|th),([^,]+),("[^,]+"),("[^,]+")'
     if [[ $row =~ $row_re ]]; then
-        if [[ $field == year ]]; then
+        if [[ $field == round ]]; then
             echo "${BASH_REMATCH[1]}"
-        elif [[ $field == place ]]; then
+        elif [[ $field == year ]]; then
             echo "${BASH_REMATCH[2]}"
-        elif [[ $field == author ]]; then
+        elif [[ $field == place ]]; then
             echo "${BASH_REMATCH[3]}"
-        elif [[ $field == title ]]; then
-            echo "${BASH_REMATCH[4]}"
-        elif [[ $field == filename ]]; then
+        elif [[ $field == author ]]; then
             echo "${BASH_REMATCH[5]}"
+        elif [[ $field == title ]]; then
+            echo "${BASH_REMATCH[6]}"
+        elif [[ $field == filename ]]; then
+            echo "${BASH_REMATCH[7]}"
         else
             fatalError "Field $field is not recognized"
         fi
@@ -219,7 +221,7 @@ while read row; do
 
     # Launch tracker. The user should save a wav file of the
     # render entitled render.wav, in the same temporary directory
-    eval $(find_unpacked_entry $tmp_dir)
+    eval "$(find_unpacked_entry "$tmp_dir")"
         
     # Normalize and convert to the right format
     # TODO DC offset
@@ -239,4 +241,6 @@ while read row; do
         -T "Album Title=SDCompo Round {pad_rnd}" \
         -T "Year=$row_year" \
         -T "Track Number=$track_num"
-done < $METADATA
+
+    exit 1
+done < <(tail -n+2 $METADATA)
