@@ -2,6 +2,9 @@
 
 # You must execute the script from its directory
 
+set -u
+set -x
+
 if [[ $# != 1 && $# != 2 ]]; then
     echo "Error: wrong usage"
     echo "Usage: $0 ROUND [AUTHOR]"
@@ -13,8 +16,13 @@ fi
 ##############
 
 ROUND=$1
-AUTHOR=$2
+if [[ $# == 2 ]]; then
+    AUTHOR=$2
+else
+    AUTHOR=
+fi
 ENTRY_DIR="../Entries"
+RENDERS_DIR="../Renders"
 METADATA="metadata_rnd_1_to_75.csv"
 
 #############
@@ -58,23 +66,28 @@ unpack() {
     local tmp_dir=$(mktemp -d SDCompo.XXXXX)
 
     # Unpack the entry in that directory
-    if [[ $filename =~ ^.+\.(rar|RAR)\$ ]]; then
+    local rar_re='(rar|RAR)$'
+    local zip_re='(zip|ZIP)$'
+    local tgz_re='tar\.gz$'
+    local tbz_re='tar\.bz$'
+    local copy_re='(xrns|it|psy)$'
+    if [[ $filename =~ $rar_re ]]; then
         # Unrar
-        fataError "RAR format not implemented yet"
-    elif [[ $filename =~ ^.+\.(zip|ZIP)\$ ]]; then
+        fatalError "RAR format not implemented yet"
+    elif [[ $filename =~ $zip_re ]]; then
         # Unzip
-        unzip $filename -d $tmp_dir
-    elif [[ $filename =~ ^.+\.(tar\.gz)\$ ]]; then
+        unzip -qq $filename -d $tmp_dir
+    elif [[ $filename =~ $tgz_re ]]; then
         # Untar gz
         tar xvjf $filename -C $tmp_dir
-    elif [[ $filename =~ ^.+\.tar\.bz\$ ]]; then
+    elif [[ $filename =~ $tbz_re ]]; then
         # Untar bz
-        fataError "tar.bz format not implemented yet"
-    elif [[ $filename =~ ^.+\.(xrns|it|psy)\$ ]]; then
+        fatalError "tar.bz format not implemented yet"
+    elif [[ $filename =~ $copy_re ]]; then
         # Merely copy
         cp $filename $tmp_dir
     else
-        fataError "Cannot identify the format in $filename"
+        fatalError "Cannot identify the format in $filename"
     fi
     echo "$tmp_dir"
 }
@@ -83,26 +96,28 @@ unpack() {
 renoise_doc_version() {
     local filename="$1"
     local filedir="$(dirname "$filename")"
-    unzip $filename -d "$filedir"
-    local sed_re='s/<RenoiseSong doc_version=\"\([[:digit:]]+\)\">/\1/'
-    sed $sed_re "$filedir/Song.xml"
+    unzip -qq $filename -d "$filedir"
+    local re='<RenoiseSong doc_version="([[:digit:]]+)">'
+    while read line; do
+        if [[ $line =~ $re ]]; then
+            echo ${BASH_REMATCH[1]}
+            break
+        fi
+    done < "$filedir/Song.xml"
 }
 
 # Map Renoise file to Renoise program path
 renoise_pgr() {
-    local pgr_dir="~/.wine/drive_c/Program Files (x86)"
+    local pgr_dir="/home/$USER/.wine/drive_c/Program Files (x86)"
     local doc_string="$(renoise_doc_version "$1")"
     case $doc_string in
-        10) echo "wine $pgr_dir/Renoise 1.9.1/Renoise.exe"
+        10) echo "wine \"$pgr_dir/Renoise 1.9.1/Renoise.exe\""
             ;;
-        14)
-            echo "wine $pgr_dir/Renoise 2.0.0/Renoise.exe"
+        14) echo "wine \"$pgr_dir/Renoise 2.0.0/Renoise.exe\""
             ;;
-        21)
-            echo "wine $pgr_dir/Renoise 2.5.1/Renoise.exe"
+        21) echo "wine \"$pgr_dir/Renoise 2.5.1/Renoise.exe\""
             ;;
-        *)
-            fatalError "doc_string $doc_string not implemented"
+        *)  fatalError "doc_string $doc_string not implemented"
             ;;
     esac
 }
@@ -113,6 +128,11 @@ it_cwt_cmwt() {
     local cwt=$(xxd -p -l 2 -seek 0x28 $filename)
     local cmwt=$(xxd -p -l 2 -seek 0x2A $filename)
     echo "$cwt $cmwt"
+}
+
+# Map Psycle file to Psycle player program path
+psy_pgr() {
+    echo "psycle"
 }
 
 # Map IT file to IT player program path
@@ -134,9 +154,9 @@ it_pgr() {
 # separated by whitespace.
 find_unpacked_entry() {
     local TMP_DIR="$1"
-    xrns_files="$(ls $TMP_DIR/*.xrns)" # Renoise
-    psy_files="$(ls $TMP_DIR/*.psy)"   # Psycle
-    it_files="$(ls $TMP_DIR/*.it)"     # Impulse Tracker
+    xrns_files="$(ls $TMP_DIR/*.xrns 2> /dev/null)" # Renoise
+    psy_files="$(ls $TMP_DIR/*.psy 2> /dev/null)"   # Psycle
+    it_files="$(ls $TMP_DIR/*.it 2> /dev/null)"     # Impulse Tracker
     if [[ "$xrns_files" ]]; then
         echo $(renoise_pgr "$xrns_files") "$xrns_files"
     elif [[ "$psy_files" ]]; then
@@ -159,7 +179,7 @@ find_unpacked_entry() {
 get_value() {
     row="$1"
     field="$2"
-    row_re='([[:digit:]]+),([[:digit:]]{4}),([[:digit:]]+)(st|nd|rd|th),([^,]+),("[^,]+"),("[^,]+")'
+    row_re='([[:digit:]]+),([[:digit:]]{4}),([[:alnum:]]+),([^,]+),"([^"]+)","([^"]+)"'
     if [[ $row =~ $row_re ]]; then
         if [[ $field == round ]]; then
             echo "${BASH_REMATCH[1]}"
@@ -168,11 +188,11 @@ get_value() {
         elif [[ $field == place ]]; then
             echo "${BASH_REMATCH[3]}"
         elif [[ $field == author ]]; then
-            echo "${BASH_REMATCH[5]}"
+            echo "${BASH_REMATCH[4]}"
         elif [[ $field == title ]]; then
-            echo "${BASH_REMATCH[6]}"
+            echo "${BASH_REMATCH[5]}"
         elif [[ $field == filename ]]; then
-            echo "${BASH_REMATCH[7]}"
+            echo "${BASH_REMATCH[6]}"
         else
             fatalError "Field $field is not recognized"
         fi
@@ -190,8 +210,11 @@ while read row; do
     row_round=$(get_value "$row" round)
     row_author=$(get_value "$row" author)
 
-    # If the round doesn't match, skip that entry
-    if [[ $row_round != $ROUND ]]; then
+    # If the round doesn't match, skip that entry. Or break if it's
+    # passed the target round
+    if [[ $row_round -gt $ROUND ]]; then
+        break
+    elif [[ $row_round -lt $ROUND ]]; then
         continue
     fi
 
@@ -221,14 +244,15 @@ while read row; do
 
     # Launch tracker. The user should save a wav file of the
     # render entitled render.wav, in the same temporary directory
-    eval "$(find_unpacked_entry "$tmp_dir")"
+    CMD="$(find_unpacked_entry "$tmp_dir")"
+    eval "$CMD"
         
     # Normalize and convert to the right format
     # TODO DC offset
     sox --norm -b 16 -r 44100 "$tmp_dir/render.wav" "$tmp_dir/render_fmt.wav"
 
     # Define the output flac file
-    of_place=$(fwt_place $row_place)
+    of_place=$(fmt_place $row_place)
     of_title=${row_title// /_}
     pad_rnd=$(pad $row_round 3)
     mkdir -p "$RENDERS_DIR/$RND"
@@ -242,5 +266,6 @@ while read row; do
         -T "Year=$row_year" \
         -T "Track Number=$track_num"
 
-    exit 1
+    # # Delete temporary
+    # rm -r "$tmp_dir"
 done < <(tail -n+2 $METADATA)
