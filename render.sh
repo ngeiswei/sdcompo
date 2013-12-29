@@ -1,6 +1,13 @@
 #!/bin/bash
 
-# You must execute the script from its directory
+# You must execute the script from its directory. Once inside the
+# tracker you must save the render under the same directory of the
+# loaded file with the name
+#
+# render.wav
+#
+# (be careful not to produce render.wav.wav, as the tracker might
+# append .wav to your file name).
 
 set -u
 set -x
@@ -249,7 +256,7 @@ while read row; do
         
     # Normalize and convert to the right format
     # TODO DC offset
-    sox --norm -b 16 -r 44100 "$tmp_dir/render.wav" "$tmp_dir/render_fmt.wav"
+    sox "$tmp_dir/render.wav" --norm -b 16 -r 44100 "$tmp_dir/render_fmt.wav"
 
     # Define the output flac file
     of_place=$(fmt_place $row_place)
@@ -259,12 +266,12 @@ while read row; do
     ofile="$RENDERS_DIR/$RND/SDC${pad_rnd}-${of_place}_${row_author}_-_${of_title}.flac"
     
     # Encode in flac with the tags
-    flac "$tmp_dir/render_fmt.wav" -5 -o "$ofile" \
-        -T "Artist Name=$row_author" \
-        -T "Track Title=$row_title" \
-        -T "Album Title=SDCompo Round {pad_rnd}" \
-        -T "Year=$row_year" \
-        -T "Track Number=$track_num"
+    flac -f "$tmp_dir/render_fmt.wav" -5 -o "$ofile" \
+        -T "ARTIST=$row_author" \
+        -T "TITLE=$row_title" \
+        -T "ALBUM=SDCompo Round ${pad_rnd}" \
+        -T "DATE=$row_year" \
+        -T "TRACKNUMBER=$track_num"
 
     # # Delete temporary
     # rm -r "$tmp_dir"
