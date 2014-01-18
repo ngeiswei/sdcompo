@@ -10,7 +10,7 @@
 # append .wav to your file name).
 
 set -u
-set -x
+# set -x
 
 if [[ $# != 1 && $# != 2 ]]; then
     echo "Error: wrong usage"
@@ -31,6 +31,7 @@ fi
 ENTRY_DIR="../Entries"
 RENDERS_DIR="../Renders"
 METADATA="metadata_rnd_1_to_75.csv"
+WIN32_PGR_DIR="/home/$USER/.wine/drive_c/Program Files (x86)"
 
 #############
 # Functions #
@@ -115,14 +116,13 @@ renoise_doc_version() {
 
 # Map Renoise file to Renoise program path
 renoise_pgr() {
-    local pgr_dir="/home/$USER/.wine/drive_c/Program Files (x86)"
     local doc_string="$(renoise_doc_version "$1")"
     case $doc_string in
-        10) echo "wine \"$pgr_dir/Renoise 1.9.1/Renoise.exe\""
+        10) echo "wine \"$WIN32_PGR_DIR/Renoise 1.9.1/Renoise.exe\""
             ;;
-        14) echo "wine \"$pgr_dir/Renoise 2.0.0/Renoise.exe\""
+        14) echo "wine \"$WIN32_PGR_DIR/Renoise 2.0.0/Renoise.exe\""
             ;;
-        21) echo "wine \"$pgr_dir/Renoise 2.5.1/Renoise.exe\""
+        21) echo "wine \"$WIN32_PGR_DIR/Renoise 2.5.1/Renoise.exe\""
             ;;
         *)  fatalError "doc_string $doc_string not implemented"
             ;;
@@ -139,7 +139,7 @@ it_cwt_cmwt() {
 
 # Map Psycle file to Psycle player program path
 psy_pgr() {
-    echo "psycle"
+    echo "wine \"$WIN32_PGR_DIR/Psycle Modular Music Studio/psycle.exe\""
 }
 
 # Map IT file to IT player program path
@@ -240,6 +240,8 @@ while read row; do
     row_title="$(get_value "$row" title)"
     row_filename="$(get_value "$row" filename)"
 
+    echo "=== Process round $row_round, $row_title by $row_author ==="
+
     # Define round directory name
     RND="round${row_round}"
 
@@ -252,11 +254,25 @@ while read row; do
     # Launch tracker. The user should save a wav file of the
     # render entitled render.wav, in the same temporary directory
     CMD="$(find_unpacked_entry "$tmp_dir")"
-    eval "$CMD"
-        
+    echo "$CMD"
+    echo "Please save the render into file $tmp_dir/render.wav"
+    eval "$CMD 1> $tmp_dir/tracker.stdout 2> $tmp_dir/tracker.stderr"
+
+    # Look for the rendered file
+    if [[ -f "$tmp_dir/render.wav" ]]; then
+        RENDER_FILE="$tmp_dir/render.wav"
+    else
+        RENDER_FILE=$(ls $tmp_dir/*.wav)
+        if [[ $RENDER_FILE ]]; then
+            echo "[WARNING] There is no $tmp_dir/render.wav, instead $RENDER_FILE will be used"
+        else
+            fatalError "Cannot find any render file"
+        fi
+    fi
+
     # Normalize and convert to the right format
     # TODO DC offset
-    sox "$tmp_dir/render.wav" --norm -b 16 -r 44100 "$tmp_dir/render_fmt.wav"
+    sox "$RENDER_FILE" --norm -b 16 -r 44100 "$tmp_dir/render_fmt.wav"
 
     # Define the output flac file
     of_place=$(fmt_place $row_place)
@@ -273,6 +289,6 @@ while read row; do
         -T "DATE=$row_year" \
         -T "TRACKNUMBER=$track_num"
 
-    # # Delete temporary
-    # rm -r "$tmp_dir"
+    # Delete temporary
+    rm -r "$tmp_dir"
 done < <(tail -n+2 $METADATA)
