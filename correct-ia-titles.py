@@ -6,6 +6,12 @@ import csv
 # You need ngeiswei's fork at https://github.com/ngeiswei/ia-wrapper
 from internetarchive import get_item
 
+def padded_place(place_str):
+    if place_str == 'AV':
+        return place_str
+    else:
+        return "{0:02d}".format(int(place_str[:-2]))
+
 def main():
     parser = argparse.ArgumentParser(description='Correct the title of the entries of a given set of rounds.')
     parser.add_argument('rounds', metavar='ROUND', nargs='+',
@@ -16,16 +22,21 @@ def main():
     args = parser.parse_args()
 
     # Load metadata
-    reader = csv.DictReader(args.metadata_file)
+    reader = csv.DictReader(open(args.metadata_file))
 
     # Iterate over entries of those rounds
     for d in reader:
         if d['round'] in args.rounds:
-            # TODO
-            target = 'files/hello-world.txt'
-            md = {'new-file-tag': 'test value'}
-            item = get_item('iacli-test-item')
-            item.modify_metadata(md, target=target)
+            target_file = 'files/' + d['filename']
+            place = d['place']
+            author = d['author']
+            padded_round = "{0:03d}".format(int(d['round']))
+            title = d['title']
+            new_title = place + ' - SDC' + padded_round + '-' + padded_place(place) \
+                + '_' + author + '_-_' + title
+            md = {'Title': new_title}
+            item = get_item('SDCompo_Round_' + padded_round)
+            item.modify_metadata(md, target=target_file)
 
 if __name__ == "__main__":
     main()
