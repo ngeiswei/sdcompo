@@ -2,9 +2,14 @@
 
 import argparse
 import csv
+import os
 
 # You need ngeiswei's fork at https://github.com/ngeiswei/ia-wrapper
 from internetarchive import get_item
+
+def change_file_extension(filename, new_extension):
+    (root, _) = os.path.splitext(filename)
+    return root + "." + new_extension
 
 def padded_place(place_str):
     if place_str == 'AV':
@@ -27,15 +32,18 @@ def main():
     # Iterate over entries of those rounds
     for d in reader:
         if d['round'] in args.rounds:
-            target_file = 'files/' + d['filename']
             place = d['place']
             author = d['author']
             padded_round = "{0:03d}".format(int(d['round']))
             title = d['title']
-            new_title = place + ' - SDC' + padded_round + '-' + padded_place(place) \
-                + '_' + author + '_-_' + title
+            root_target_file = 'SDC' + padded_round + '-' + padded_place(place) \
+                + '_' + author + '_-_' + title.replace(' ', '_')
+            target_file = 'files/' + root_target_file + ".flac"
+            new_title = place + ' - ' + root_target_file
             md = {'Title': new_title}
+            print "md =", md
             item = get_item('SDCompo_Round_' + padded_round)
+            print "item =", item
             item.modify_metadata(md, target=target_file)
 
 if __name__ == "__main__":
