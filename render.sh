@@ -9,6 +9,9 @@
 # (be careful not to produce render.wav.wav, as the tracker might
 # append .wav to your file name).
 
+# TODO: check whether the flac file has been created and asked to skip
+# or not
+
 set -u
 # set -x
 
@@ -79,21 +82,21 @@ unpack() {
     local tgz_re='tar\.gz$'
     local tbz_re='tar\.bz$'
     local copy_re='(xrns|it|psy)$'
-    if [[ $filename =~ $rar_re ]]; then
+    if [[ "$filename" =~ $rar_re ]]; then
         # Unrar
-        fatalError "RAR format not implemented yet"
-    elif [[ $filename =~ $zip_re ]]; then
+        unrar e "$filename" "$tmp_dir" &> /dev/null
+    elif [[ "$filename" =~ $zip_re ]]; then
         # Unzip
-        unzip -qq $filename -d $tmp_dir
-    elif [[ $filename =~ $tgz_re ]]; then
+        unzip -qq "$filename" -d "$tmp_dir"
+    elif [[ "$filename" =~ $tgz_re ]]; then
         # Untar gz
-        tar xvjf $filename -C $tmp_dir
-    elif [[ $filename =~ $tbz_re ]]; then
+        tar xvjf "$filename" -C "$tmp_dir"
+    elif [[ "$filename" =~ $tbz_re ]]; then
         # Untar bz
         fatalError "tar.bz format not implemented yet"
-    elif [[ $filename =~ $copy_re ]]; then
+    elif [[ "$filename" =~ $copy_re ]]; then
         # Merely copy
-        cp $filename $tmp_dir
+        cp "$filename" "$tmp_dir"
     else
         fatalError "Cannot identify the format in $filename"
     fi
@@ -255,7 +258,7 @@ while read row; do
     # render entitled render.wav, in the same temporary directory
     CMD="$(find_unpacked_entry "$tmp_dir")"
     echo "$CMD"
-    echo "Please save the render into file $tmp_dir/render.wav"
+    echo "Save the render under $tmp_dir as a wav file, if some wav files are already there then you may save it as render.wav"
     eval "$CMD 1> $tmp_dir/tracker.stdout 2> $tmp_dir/tracker.stderr"
 
     # Look for the rendered file
@@ -264,7 +267,7 @@ while read row; do
     else
         RENDER_FILE=$(ls $tmp_dir/*.wav)
         if [[ $RENDER_FILE ]]; then
-            echo "[WARNING] There is no $tmp_dir/render.wav, instead $RENDER_FILE will be used"
+            echo "There is no $tmp_dir/render.wav, instead $RENDER_FILE will be used"
         else
             fatalError "Cannot find any render file"
         fi
@@ -280,7 +283,7 @@ while read row; do
     pad_rnd=$(pad $row_round 3)
     mkdir -p "$RENDERS_DIR/$RND"
     ofile="$RENDERS_DIR/$RND/SDC${pad_rnd}-${of_place}_${row_author}_-_${of_title}.flac"
-    
+
     # Encode in flac with the tags
     flac -f "$tmp_dir/render_fmt.wav" -5 -o "$ofile" \
         -T "ARTIST=$row_author" \
