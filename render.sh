@@ -9,9 +9,6 @@
 # (be careful not to produce render.wav.wav, as the tracker might
 # append .wav to your file name).
 
-# TODO: check whether the flac file has been created and asked to skip
-# or not
-
 set -u
 # set -x
 
@@ -248,6 +245,22 @@ while read row; do
     # Define round directory name
     RND="round${row_round}"
 
+    # Define the output flac file
+    of_place=$(fmt_place $row_place)
+    of_title=${row_title// /_}
+    pad_rnd=$(pad $row_round 3)
+    mkdir -p "$RENDERS_DIR/$RND"
+    ofile="$RENDERS_DIR/$RND/SDC${pad_rnd}-${of_place}_${row_author}_-_${of_title}.flac"
+
+    # Check whether the flac file has already been created and ask the
+    # user whether to skip
+    if [[ -f "$ofile" ]]; then
+        read -e -p "$ofile exists, $row_filename has probably already been rendered, do you want to skip it [Y/n]? " answer </dev/tty
+        if [[ -z $answer || $answer =~ Y|y ]]; then
+            continue
+        fi
+    fi
+
     # Get the actual path
     filename="$(find "$ENTRY_DIR/$RND" -name "$row_filename")"
     
@@ -276,13 +289,6 @@ while read row; do
     # Normalize and convert to the right format
     # TODO DC offset
     sox "$RENDER_FILE" --norm -b 16 -r 44100 "$tmp_dir/render_fmt.wav"
-
-    # Define the output flac file
-    of_place=$(fmt_place $row_place)
-    of_title=${row_title// /_}
-    pad_rnd=$(pad $row_round 3)
-    mkdir -p "$RENDERS_DIR/$RND"
-    ofile="$RENDERS_DIR/$RND/SDC${pad_rnd}-${of_place}_${row_author}_-_${of_title}.flac"
 
     # Encode in flac with the tags
     flac -f "$tmp_dir/render_fmt.wav" -5 -o "$ofile" \
