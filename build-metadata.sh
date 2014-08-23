@@ -17,6 +17,7 @@
 if [[ $# != 2 ]]; then
     echo "Wrong usage"
     echo "Usage: $0 LOW_ROUND UP_ROUND"
+    echo "Build metadata for all rounds from LOW_ROUND to UP_ROUND, both included"
     exit 1
 fi
 
@@ -49,6 +50,14 @@ fatalError() {
     exit 1
 }
 
+# Fix HTML special characters (to be piped in)
+HTML2TXT() {
+    sed -e 's/&quot;/\"/g' \
+        -e 's/&amp;/\&/g' \
+        -e 's/&gt;/>/g' \
+        -e 's/&#365;/ŭ/g'
+}
+
 ########
 # Main #
 ########
@@ -73,7 +82,10 @@ echo $header
 for rnd in $(seq $LOW_ROUND $UP_ROUND); do
     place=""; author=""; title=""; filename=""
     while read line; do
+        # Convert to utf-8
         line="$(iconv -f iso-8859-1 -t utf-8 <<< "$line")"
+        # Fix HTML special characters
+        line="$(HTML2TXT <<< "$line")" 
         if [[ $line =~ $ps_re ]]; then
             if [[ -z $place ]]; then
                 place=${BASH_REMATCH[1]}
