@@ -30,7 +30,7 @@ else
 fi
 ENTRY_DIR="../Entries"
 RENDERS_DIR="../Renders"
-METADATA="metadata_rnd_1_to_75.csv"
+METADATA="metadata_rnd_1_to_85.csv"
 WIN32_PGR_DIR="/home/$USER/.wine/drive_c/Program Files (x86)"
 
 #############
@@ -186,7 +186,7 @@ find_unpacked_entry() {
 get_value() {
     row="$1"
     field="$2"
-    row_re='([[:digit:]]+),([[:digit:]]{4}),([[:alnum:]]+),([^,]+),"([^"]+)","([^"]+)"'
+    row_re='^([[:digit:]]+),([[:digit:]]{4}),([[:alnum:]]+),([^,]+),"(.+)","(.+)"$'
     if [[ $row =~ $row_re ]]; then
         if [[ $field == round ]]; then
             echo "${BASH_REMATCH[1]}"
