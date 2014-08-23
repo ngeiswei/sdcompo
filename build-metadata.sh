@@ -52,7 +52,7 @@ fatalError() {
 
 # Fix HTML special characters (to be piped in)
 HTML2TXT() {
-    sed -e 's/&quot;/\"/g' \
+    sed -e 's/&quot;/\\\"/g' \
         -e 's/&amp;/\&/g' \
         -e 's/&gt;/>/g' \
         -e 's/&#365;/ŭ/g'
