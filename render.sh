@@ -104,7 +104,7 @@ unpack() {
 renoise_doc_version() {
     local filename="$1"
     local filedir="$(dirname "$filename")"
-    unzip -qq $filename -d "$filedir"
+    unzip -qq "$filename" -d "$filedir"
     local re='<RenoiseSong doc_version="([[:digit:]]+)">'
     while read line; do
         if [[ $line =~ $re ]]; then
@@ -165,11 +165,11 @@ find_unpacked_entry() {
     psy_files="$(ls $TMP_DIR/*.psy 2> /dev/null)"   # Psycle
     it_files="$(ls $TMP_DIR/*.it 2> /dev/null)"     # Impulse Tracker
     if [[ "$xrns_files" ]]; then
-        echo $(renoise_pgr "$xrns_files") "$xrns_files"
+        echo $(renoise_pgr "$xrns_files") "\"$xrns_files\""
     elif [[ "$psy_files" ]]; then
-        echo $(psy_pgr "$psy_files") "$psy_files"
+        echo $(psy_pgr "$psy_files") "\"$psy_files\""
     elif [[ "$it_files" ]]; then
-        echo $(it_pgr "$it_files") "$it_files"
+        echo $(it_pgr "$it_files") "\"$it_files\""
     else
         fatalError "Unknown tracker files in directory $TMP_DIR"
     fi
@@ -271,7 +271,7 @@ while read row; do
     # render entitled render.wav, in the same temporary directory
     CMD="$(find_unpacked_entry "$tmp_dir")"
     echo "$CMD"
-    echo "Save the render under $tmp_dir as a wav file, if some wav files are already there then you may save it as render.wav"
+    echo "Save the render under $tmp_dir as a wav file, if some wav files are already there then you may save it as render.wav to disambiguate"
     eval "$CMD 1> $tmp_dir/tracker.stdout 2> $tmp_dir/tracker.stderr"
 
     # Look for the rendered file
