@@ -12,15 +12,15 @@
 set -u
 # set -x
 
+###################
+# Program options #
+###################
+
 if [[ $# != 1 && $# != 2 ]]; then
     echo "Error: wrong usage"
     echo "Usage: $0 ROUND [AUTHOR]"
     exit 1
 fi
-
-##############
-# Parameters #
-##############
 
 ROUND=$1
 if [[ $# == 2 ]]; then
@@ -28,30 +28,25 @@ if [[ $# == 2 ]]; then
 else
     AUTHOR=
 fi
-ENTRY_DIR="../Entries"
-RENDERS_DIR="../Renders"
-METADATA="metadata_rnd_1_to_85.csv"
+
+####################
+# Source common.sh #
+####################
+
+PROG_PATH=$(readlink -f "$0")
+PROG_DIR=$(dirname "$PROG_PATH")
+CM_DIR="$PROG_DIR/common"
+. "$CMD_DIR/common.sh"
+
+#############
+# Constants #
+#############
+
 WIN32_PGR_DIR="/home/$USER/.wine/drive_c/Program Files (x86)"
 
 #############
 # Functions #
 #############
-
-warning() {
-    echo "[WARN] $@" 1>&2
-}
-
-# Given an error message, display that error on stderr and exit
-fatalError() {
-    echo "[ERROR] $@" 1>&2
-    exit 1
-}
-
-# pad $1 symbol with up to $2 0s
-pad() {
-    pad_expression="%0${2}d"
-    printf "$pad_expression" "$1"    
-}
 
 # Format place correctly, 1st returns 01, AV returns AV, etc.
 fmt_place() {

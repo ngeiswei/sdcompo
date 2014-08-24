@@ -10,9 +10,9 @@
 
 # set -x
 
-#######################
-# Parse CLI arguments #
-#######################
+###################
+# Program options #
+###################
 
 if [[ $# != 2 ]]; then
     echo "Wrong usage"
@@ -23,6 +23,15 @@ fi
 
 LOW_ROUND=$1
 UP_ROUND=$2
+
+####################
+# Source common.sh #
+####################
+
+PROG_PATH=$(readlink -f "$0")
+PROG_DIR=$(dirname "$PROG_PATH")
+CM_DIR="$PROG_DIR/common"
+. "$CMD_DIR/common.sh"
 
 #############
 # Constants #
@@ -42,12 +51,6 @@ readonly at_re='<td class="results_table_at"><.+>(.+)</a></td>'
 downloadMT() {
     local rnd=$1
     wget "http://www.sdcompo.com/results.php?r=$rnd" -O - 2> /dev/null
-}
-
-# Given an error message, display that error on stderr and exit
-fatalError() {
-    echo "[ERROR] $@" 1>&2
-    exit 1
 }
 
 # Fix HTML special characters (to be piped in)
