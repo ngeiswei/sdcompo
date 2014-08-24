@@ -11,11 +11,6 @@ renders to Internet Archive (archive.org).
 Requirements
 ------------
 
-TODO
-
-Install
--------
-
 TODO (install custom iawrapper)
 
 Preparation
