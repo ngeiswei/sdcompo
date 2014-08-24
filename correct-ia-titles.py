@@ -21,7 +21,7 @@ def main():
     parser = argparse.ArgumentParser(description='Correct the title of the entries of a given set of rounds.')
     parser.add_argument('rounds', metavar='ROUND', nargs='+',
                         help='Round to correct')
-    parser.add_argument('--metadata-file', default='metadata_rnd_1_to_75.csv',
+    parser.add_argument('--metadata-file', default='metadata_rnd_1_to_85.csv',
                         help='Path of the metadata file')
 
     args = parser.parse_args()
