@@ -101,8 +101,17 @@ To upload the round(s) now rendered just type
 ```
 
 Of course will need to have registered your name and password to
-ia-wrapper (see ??? for for information).
+ia-wrapper (see TODO for information).
 
 Once the rounds are uploaded, you're gonna have to fix a few tags and
-song titles. But you the internetarchive needs to have completely
-converted the flac files into mp3 (and ogg?). TODO
+song titles. But first the internetarchive needs to have completely
+converted the flac files into mp3s, which may take up to an hour. You
+may want to check that everything has been converted just to be sure,
+before running the next script. Once it's ready run the following
+python script:
+
+```
+./correct-ia-titles.py ROUND
+```
+
+where ROUND is obviously the number of the ROUND you wish to correct.
