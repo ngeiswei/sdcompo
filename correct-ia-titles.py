@@ -41,7 +41,7 @@ def main():
             target_file = 'files/' + root_target_file + ".flac"
             new_title = place + ' - ' + root_target_file
             md = {'title': new_title}
-            item = get_item('SDCompo_Round_' + padded_round)
+            item = get_item('SDCompo_Round_' + padded_round + '_UPLOAD_TEST')
             print "Round {} {}: '{}' -> '{}'".format(d['round'], author, title, new_title)
             item.modify_metadata(md, target=target_file)
 

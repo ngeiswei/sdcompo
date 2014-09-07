@@ -27,6 +27,6 @@ fatalError "TODO: set right attributes, mediatype:audio, collection:opensource_a
 
 for rnd in $@; do
     pad_rnd=$(pad $rnd 3)
-    identifier=SDCompo_Round_${pad_rnd}
+    identifier=SDCompo_Round_${pad_rnd}_UPLOAD_TEST
     ia upload $identifier "$RENDERS_DIR"/round${rnd}/*.flac
 done
