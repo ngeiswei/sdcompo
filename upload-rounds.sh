@@ -2,6 +2,9 @@
 
 # Script to upload rounds to the internetarchive.com
 
+set -u
+set -x
+
 ###################
 # Program options #
 ###################
@@ -23,10 +26,11 @@ PROG_DIR=$(dirname "$PROG_PATH")
 # Main #
 ########
 
-fatalError "TODO: set right attributes, mediatype:audio, collection:opensource_audio, date:ROUND_DATE, licenseurl:???. PER TITLE ATTRIBUTES: Album:???, Creator:???"
-
 for rnd in $@; do
     pad_rnd=$(pad $rnd 3)
-    identifier=SDCompo_Round_${pad_rnd}_UPLOAD_TEST
-    ia upload $identifier "$RENDERS_DIR"/round${rnd}/*.flac
+    identifier=SDCompo_Round_${pad_rnd}_UPLOAD_TEST_FIX_METADATA
+    infoEcho "Upload rendered files to $identifier"
+    ia upload $identifier "$RENDERS_DIR"/round${rnd}/*.flac \
+        --metadata="mediatype:audio" \
+        --metadata="collection:opensource_audio"
 done
