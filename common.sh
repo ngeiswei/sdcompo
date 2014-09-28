@@ -4,13 +4,17 @@
 # Constants #
 #############
 
-readonly ENTRY_DIR="../Entries"
-readonly RENDERS_DIR="../Renders"
+readonly ENTRIES_DIR="entries"
+readonly RENDERS_DIR="renders"
 readonly METADATA="metadata_rnd_1_to_85.csv"
 
 #############
 # Functions #
 #############
+
+infoEcho() {
+    echo "[INFO] $@"
+}
 
 warning() {
     echo "[WARN] $@" 1>&2

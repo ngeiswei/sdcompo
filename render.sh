@@ -257,7 +257,7 @@ while read row; do
     fi
 
     # Get the actual path
-    filename="$(find "$ENTRY_DIR/$RND" -name "$row_filename")"
+    filename="$(find "$ENTRIES_DIR/$RND" -name "$row_filename")"
     
     # Unpack the entry into a temporary directory
     tmp_dir="$(unpack "$filename")"
