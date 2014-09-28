@@ -32,7 +32,7 @@ Requirements
 ```
 $ git clone https://github.com/ngeiswei/ia-wrapper.git
 $ cd ia-wrapper
-$ python sudo setup.py install
+$ sudo python setup.py install
 ```
 
 Preparation
@@ -49,13 +49,12 @@ Preparation
 
     ```
     mkdir entries
-    ftp ftp.sdcompo.com # you're supposed to know the name and password
-    wget --no-host-directories -r ftp://USER:PASS@sdcompo.com/round{LOW_RND..UP_RND}
+    wget --no-host-directories -r --user=USER --password=PASS ftp://sdcompo.com/round{LOW_RND..UP_RND}
+
     ```
 
     where LOW_RND and UP_RND is the closed interval of rounds to
-    download. Don't forget to replace USER and PASS by what there are
-    supposed to be.
+    download. You're supposed to know what USER and PASS are. 
 
 3. Generate the metadata
 
