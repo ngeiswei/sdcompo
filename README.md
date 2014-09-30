@@ -93,15 +93,21 @@ folder
 Upload Rounds
 -------------
 
+First will need to have registered your IAS3 access and secret keys to
+ia-wrapper, if you haven't done so, you may use ia configure tool
+
+```
+ia configure
+```
+
+and enter you IA S3 access and secret keys (that you maye get from
+http://archive.org/account/s3.php).
+
 To upload the round(s) now rendered just type
 
 ```
 ./upload-rounds.sh ROUND [ROUND ...]
 ```
-
-Of course will need to have registered your IAS3 access and secret
-keys to ia-wrapper (for more information see
-https://github.com/jjjake/ia-wrapper#uploading).
 
 Once the rounds are uploaded, you're gonna have to fix a few tags and
 song titles. But first the internetarchive needs to have completely
