@@ -30,8 +30,8 @@ UP_ROUND=$2
 
 PROG_PATH=$(readlink -f "$0")
 PROG_DIR=$(dirname "$PROG_PATH")
-CM_DIR="$PROG_DIR/common"
-. "$CMD_DIR/common.sh"
+CM_DIR="$PROG_DIR"
+. "$CM_DIR/common.sh"
 
 #############
 # Constants #
@@ -61,24 +61,77 @@ HTML2TXT() {
         -e 's/&#365;/ŭ/g'
 }
 
+monthNumber() {
+    local monthNum
+    case $1 in
+        January)
+            echo 01
+            ;;
+        February)
+            echo 02
+            ;;
+        March)
+            echo 03
+            ;;
+        April)
+            echo 04
+            ;;
+        May)
+            echo 05
+            ;;
+        June)
+            echo 06
+            ;;
+        July)
+            echo 07
+            ;;
+        August)
+            echo 08
+            ;;
+        September)
+            echo 09
+            ;;
+        October)
+            echo 10
+            ;;
+        November)
+            echo 11
+            ;;
+        December)
+            echo 12
+            ;;
+        *)
+            fatalError "No case for $1"
+            ;;
+    esac
+}
+
+dayNumber() {
+    local day=$1
+    echo $(pad ${day%??} 2)
+}
+
 ########
 # Main #
 ########
 
-# Build map round -> year
-declare -A rnd2year
+# Build map round -> date
+declare -A rnd2date
 up_rnd_body="$(downloadMT $UP_ROUND)"
 for rnd in $(seq $LOW_ROUND $UP_ROUND); do
-    re="Round $rnd \(Ended [[:alpha:]]+ [[:alnum:]]+, ([[:digit:]]{4})\)"
+    re="Round $rnd \(Ended ([[:alpha:]]+) ([[:alnum:]]+), ([[:digit:]]{4})\)"
     if [[ $up_rnd_body =~ $re ]]; then
-        rnd2year[$rnd]=${BASH_REMATCH[1]}
+        YYYY=${BASH_REMATCH[3]}
+        MM=$(monthNumber ${BASH_REMATCH[1]})
+        DD=$(dayNumber ${BASH_REMATCH[2]})
+        rnd2date[$rnd]=$YYYY-$MM-$DD
     else
         fatalError "[RND $rnd] $up_rnd_body does not match regex $re"
     fi
 done
 
 # Write header
-header="round,year,place,author,title,filename"
+header="round,date,place,author,title,filename"
 echo $header
 
 # write content
@@ -102,7 +155,7 @@ for rnd in $(seq $LOW_ROUND $UP_ROUND); do
                 elif [[ -z $filename ]]; then
                     fatalError "[RND $rnd] filename is empty, yet line $line wants to echo content"
                 else
-                    echo "$rnd,${rnd2year[$rnd]},$place,$author,\"$title\",\"$filename\""
+                    echo "$rnd,${rnd2date[$rnd]},$place,$author,\"$title\",\"$filename\""
                     place=""; author=""; title=""; filename=""
                 fi
             fi
