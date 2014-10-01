@@ -3,7 +3,7 @@
 # Given round interval, build a table in CSV format with the following
 # metadata for each entry:
 #
-# round,year,place,author,title,filename
+# round,date,place,author,title,filename
 #
 # title and filename are between double quotes as they may contain
 # commas.
