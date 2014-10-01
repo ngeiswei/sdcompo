@@ -177,7 +177,7 @@ find_unpacked_entry() {
 # 2) a field
 #
 # Return the value corresponding to that field. Possible fields are:
-# round, year, place, author, title, filename
+# round, date, place, author, title, filename
 get_value() {
     row="$1"
     field="$2"
@@ -185,7 +185,7 @@ get_value() {
     if [[ $row =~ $row_re ]]; then
         if [[ $field == round ]]; then
             echo "${BASH_REMATCH[1]}"
-        elif [[ $field == year ]]; then
+        elif [[ $field == date ]]; then
             echo "${BASH_REMATCH[2]}"
         elif [[ $field == place ]]; then
             echo "${BASH_REMATCH[3]}"
@@ -230,7 +230,7 @@ while read row; do
     fi
 
     # Get the rest of the metadata
-    row_year=$(get_value "$row" year)
+    row_date=$(get_value "$row" date)
     row_place=$(get_value "$row" place)
     row_title="$(get_value "$row" title)"
     row_filename="$(get_value "$row" filename)"
@@ -290,7 +290,7 @@ while read row; do
         -T "ARTIST=$row_author" \
         -T "TITLE=$row_title" \
         -T "ALBUM=SDCompo Round ${pad_rnd}" \
-        -T "DATE=$row_year" \
+        -T "DATE=$row_date" \
         -T "TRACKNUMBER=$track_num"
 
     # Delete temporary
