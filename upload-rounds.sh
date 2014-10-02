@@ -30,7 +30,6 @@ PROG_DIR=$(dirname "$PROG_PATH")
 get_date() {
     local ROUND=$1
     while read row; do
-        
         row_round=$(get_value "$row" round)
 
         # If the round doesn't match, skip that entry. Or break if it's
@@ -43,6 +42,7 @@ get_date() {
 
         # Get the rest of the metadata
         echo $(get_value "$row" date)
+        break
     done < <(tail -n+2 $METADATA)
 }
 
@@ -52,13 +52,15 @@ get_date() {
 
 for rnd in $@; do
     pad_rnd=$(pad $rnd 3)
-    identifier=SDCompo_Round_${pad_rnd}_UPLOAD_TEST_REFIX_METADATA
+    identifier=SDCompo_Round_${pad_rnd}_UPLOAD_TEST_GIGAFIX
     infoEcho "Upload rendered files to $identifier"
     ia upload $identifier "$RENDERS_DIR"/round${rnd}/*.flac \
         --metadata="mediatype:audio" \
         --metadata="collection:opensource_audio" \
         --metadata="date:$(get_date $rnd)" \
         --metadata="licenseurl:http://creativecommons.org/licenses/by-nc-nd/3.0/" \
-        --metadata="description:Fill this with something useful"
-    # TODO add subject tags
+        --metadata="description:Fill this with something useful" \
+        --metadata="subject:what" \
+        --metadata="subject:tags" \
+        --metadata="subject:?"
 done
