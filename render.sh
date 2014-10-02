@@ -170,39 +170,6 @@ find_unpacked_entry() {
     fi
 }
 
-# Given
-#
-# 1) a row from a metadata CSV file
-#
-# 2) a field
-#
-# Return the value corresponding to that field. Possible fields are:
-# round, date, place, author, title, filename
-get_value() {
-    row="$1"
-    field="$2"
-    row_re='^([[:digit:]]+),([[:digit:]]{4}),([[:alnum:]]+),([^,]+),"(.+)","(.+)"$'
-    if [[ $row =~ $row_re ]]; then
-        if [[ $field == round ]]; then
-            echo "${BASH_REMATCH[1]}"
-        elif [[ $field == date ]]; then
-            echo "${BASH_REMATCH[2]}"
-        elif [[ $field == place ]]; then
-            echo "${BASH_REMATCH[3]}"
-        elif [[ $field == author ]]; then
-            echo "${BASH_REMATCH[4]}"
-        elif [[ $field == title ]]; then
-            echo "${BASH_REMATCH[5]}"
-        elif [[ $field == filename ]]; then
-            echo "${BASH_REMATCH[6]}"
-        else
-            fatalError "Field $field is not recognized"
-        fi
-    else
-        fatalError "Row $row does not match regex $row_re"
-    fi
-}
-
 ########
 # Main #
 ########
