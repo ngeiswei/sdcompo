@@ -52,15 +52,20 @@ get_date() {
 
 for rnd in $@; do
     pad_rnd=$(pad $rnd 3)
-    identifier=SDCompo_Round_${pad_rnd}_UPLOAD_TEST_GIGAFIX
+    date=$(get_date $rnd)
+    year=${date%%-*}
+    identifier=SDCompo_Round_${pad_rnd}
     infoEcho "Upload rendered files to $identifier"
     ia upload $identifier "$RENDERS_DIR"/round${rnd}/*.flac \
+        --metadata="creator:Various" \
         --metadata="mediatype:audio" \
         --metadata="collection:opensource_audio" \
-        --metadata="date:$(get_date $rnd)" \
+        --metadata="date:$date" \
         --metadata="licenseurl:http://creativecommons.org/licenses/by-nc-nd/3.0/" \
-        --metadata="description:Fill this with something useful" \
-        --metadata="subject:what" \
-        --metadata="subject:tags" \
-        --metadata="subject:?"
+        --metadata="description:Round $rnd of the SounDevotion Competition, visit http://sdcompo.com for details on songs and artists." \
+        --metadata="subject:SounDevotion" \
+        --metadata="subject:compo" \
+        --metadata="subject:tracker" \
+        --metadata="subject:demoscene" \
+        --metadata="year:$year"
 done
