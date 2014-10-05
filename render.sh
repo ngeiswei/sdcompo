@@ -35,8 +35,8 @@ fi
 
 PROG_PATH=$(readlink -f "$0")
 PROG_DIR=$(dirname "$PROG_PATH")
-CM_DIR="$PROG_DIR/common"
-. "$CMD_DIR/common.sh"
+CM_DIR="$PROG_DIR"
+. "$CM_DIR/common.sh"
 
 #############
 # Constants #
