@@ -126,11 +126,15 @@ renoise_pgr() {
     esac
 }
 
-# Parse an IT file and return its Cwt and Cmwt, whitespace separated.
+# Parse an IT file and return its Cwt and Cmwt, whitespace separated
 it_cwt_cmwt() {
     local filename="$1"
     local cwt=$(xxd -p -l 2 -seek 0x28 $filename)
     local cmwt=$(xxd -p -l 2 -seek 0x2A $filename)
+    # Convert from big-endian to little-endian, because most
+    # information on the internet about Cwt and Cmwt use little-endian
+    cwt=${cwt#??}${cwt%??}
+    cmwt=${cmwt#??}${cmwt%??}
     echo "$cwt $cmwt"
 }
 
@@ -141,16 +145,67 @@ psy_pgr() {
 
 # Map IT file to IT player program path
 it_pgr() {
-    local re='([[:digit:]]+) ([[:digit:]]+)'
     cwt_cmwt="$(it_cwt_cmwt "$1")"
-    if [[ $cwt_cmwt =~ $re ]]; then
-        local cwt=${BASH_REMATCH[1]}
-        local cmwt=${BASH_REMATCH[2]}
-        # TODO return different versions based on cwt and cmwt
-        echo "schism"
-    else
-        fatalError "cwt and cmwt cannot be parsed out of $cwt_cmwt"
-    fi
+
+    # Info gathered about cwt and cmwt
+    #
+    # 1. OpenMPT 1.17 wrote the value 0888 in both the Cwt/v and Cmwt fields
+    #
+    # 2. OpenSPC  Cwt/v is 0214, Cmwt is 0200.
+    #
+    # 3. UNMO3 Cwt/v is 0214, Cmwt is 0214
+    #
+    # 4. The IT header contains a field, Cwt/v, which is used to
+    # identify the application that was used to create the
+    # file. The following custom tracker IDs (read as
+    # little-endian hexadecimal numbers) are known to be found in
+    # the Cwt/v field:
+    #
+    # 0xyy - Impulse Tracker x.yy - Many other trackers, like
+    # ModPlug Tracker, disguise as various versions of Impulse
+    # Tracker, so this is not a reliable way to tell if a file was
+    # really made with Impulse Tracker. See below for detecting
+    # such trackers.
+    #
+    # 1xyy - Schism Tracker x.yy (up to Schism Tracker v0.50,
+    # later versions encode a timestamp in the version number -
+    # see Schism Tracker’s version.c)
+    #
+    # 5xyy - OpenMPT x.yy
+    #
+    # 6xyy - BeRoTracker x.yy
+    #
+    # 7xyz - ITMCK x.y.z (N.B. the user can override the value of
+    # the Cwt/v header by the -w command-line switch or the
+    # #TRACKER-VERSION command in the input file)
+    #
+    # 5. Note: Because Schism Tracker started a few years ago to
+    # use the CWT TrackerVersion ID 0x4000 (after a 0xf000
+    # bitmask) for S3M and IT modules which originally BeRoTracker
+    # was using since 2004 for S3M modules (0x4100), BeRoTracker
+    # is now using a new CWT TrackerVerson ID 0x6000 for S3M "and"
+    # IT modules, which means from now on all saved S3M and IT
+    # modules will have the new CWT TrackerVersion ID.
+    case "$cwt_cmwt" in
+        "0888 0888") echo "TODO: old version of OpenMPT"
+            ;;
+        "0214 0200") echo "TODO: OpenSPC"
+            ;;
+        "0214 0214") echo "TODO: UNMO3"
+            ;;
+        "0*") echo "TODO: Impulse Tracker"
+            ;;
+        "1*") echo "TODO: Schism Tracker up v0.50"
+            ;;
+        "5*") echo "TODO: OpenMPT"
+            ;;
+        "6*") echo "TODO: BeRoTracker"
+            ;;
+        "7*") echo "TODO: ITMCK"
+            ;;
+        *) fatalError "cwt cmw $cwt_cmwt not implemented"
+            ;;
+    esac
 }
 
 # Given the directory with the song, previously unpacked, identify the
