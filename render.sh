@@ -233,8 +233,12 @@ while read row; do
     # render entitled render.wav, in the same temporary directory
     CMD="$(find_unpacked_entry "$tmp_dir")"
     echo "$CMD"
-    echo "Save the render under $tmp_dir as a wav file, if some wav files are already there then you may save it as render.wav to disambiguate"
+    echo "Please render the song in 44KHz 24-bit and save the result under $tmp_dir as a wav file, if some wav files are already there then you may save it as render.wav to disambiguate"
     eval "$CMD 1> $tmp_dir/tracker.stdout 2> $tmp_dir/tracker.stderr"
+
+    if [[ $? != 0 ]]; then
+        fatalError "$CMD failed. You may have a look at $tmp_dir/tracker.stderr to understand what went wrong"
+    fi
 
     # Look for the rendered file
     if [[ -f "$tmp_dir/render.wav" ]]; then
