@@ -48,6 +48,11 @@ WIN32_PGR_DIR="/home/$USER/.wine/drive_c/Program Files (x86)"
 # Functions #
 #############
 
+# Format a path to be compatible with wine
+wine_path() {
+    echo "Z:\\$(readlink -f "$1")"
+}
+
 # Format place correctly, 1st returns 01, AV returns AV, etc.
 fmt_place() {
     local place=$1
@@ -187,7 +192,7 @@ it_pgr() {
     # IT modules, which means from now on all saved S3M and IT
     # modules will have the new CWT TrackerVersion ID.
     case "$cwt_cmwt" in
-        "0888 0888") echo "TODO: old version of OpenMPT"
+        "0888 0888") echo "wine \"$WIN32_PGR_DIR/OpenMPT/mptrack.exe\""
             ;;
         "0214 0200") echo "TODO: OpenSPC"
             ;;
@@ -197,7 +202,7 @@ it_pgr() {
             ;;
         "1*") echo "TODO: Schism Tracker up v0.50"
             ;;
-        "5*") echo "TODO: OpenMPT"
+        "5*") echo "wine \"$WIN32_PGR_DIR/OpenMPT/mptrack.exe\""
             ;;
         "6*") echo "TODO: BeRoTracker"
             ;;
@@ -217,11 +222,11 @@ find_unpacked_entry() {
     psy_files="$(ls $TMP_DIR/*.psy 2> /dev/null)"   # Psycle
     it_files="$(ls $TMP_DIR/*.it 2> /dev/null)"     # Impulse Tracker
     if [[ "$xrns_files" ]]; then
-        echo $(renoise_pgr "$xrns_files") "\"$xrns_files\""
+        echo $(renoise_pgr "$xrns_files") "\"$(wine_path "$xrns_files")\""
     elif [[ "$psy_files" ]]; then
-        echo $(psy_pgr "$psy_files") "\"$psy_files\""
+        echo $(psy_pgr "$psy_files") "\"$(wine_path "$psy_files")\""
     elif [[ "$it_files" ]]; then
-        echo $(it_pgr "$it_files") "\"$it_files\""
+        echo $(it_pgr "$it_files") "\"$(wine_path "$it_files")\""
     else
         fatalError "Unknown tracker files in directory $TMP_DIR"
     fi
