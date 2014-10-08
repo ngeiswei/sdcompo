@@ -3,7 +3,7 @@
 # Script to upload rounds to the internetarchive.com
 
 set -u
-set -x
+# set -x
 
 ###################
 # Program options #
@@ -68,4 +68,7 @@ for rnd in $@; do
         --metadata="subject:tracker" \
         --metadata="subject:demoscene" \
         --metadata="year:$year"
+
+    infoEcho "Round $rnd has been uploaded, wait for a few hours then run"
+    infoEcho "correct-ia-titles.py $rnd"
 done
