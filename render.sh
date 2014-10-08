@@ -213,6 +213,11 @@ it_pgr() {
     esac
 }
 
+# Map IT file to IT player program path
+bmx_pgr() {
+    echo "wine \"$WIN32_PGR_DIR/Jeskola Buzz/Buzz.exe\""
+}
+
 # Given the directory with the song, previously unpacked, identify the
 # entry, identify the tracker, return the tracker and the entry file
 # separated by whitespace.
@@ -221,12 +226,15 @@ find_unpacked_entry() {
     xrns_files="$(ls $TMP_DIR/*.xrns 2> /dev/null)" # Renoise
     psy_files="$(ls $TMP_DIR/*.psy 2> /dev/null)"   # Psycle
     it_files="$(ls $TMP_DIR/*.it 2> /dev/null)"     # Impulse Tracker
+    bmx_files="$(ls $TMP_DIR/*.bmx 2> /dev/null)"   # Buzz Tracker
     if [[ "$xrns_files" ]]; then
         echo $(renoise_pgr "$xrns_files") "\"$(wine_path "$xrns_files")\""
     elif [[ "$psy_files" ]]; then
         echo $(psy_pgr "$psy_files") "\"$(wine_path "$psy_files")\""
     elif [[ "$it_files" ]]; then
         echo $(it_pgr "$it_files") "\"$(wine_path "$it_files")\""
+    elif [[ "$bmx_files" ]]; then
+        echo $(bmx_pgr "$bmx_files") "\"$(wine_path "$bmx_files")\""
     else
         fatalError "Unknown tracker files in directory $TMP_DIR"
     fi
