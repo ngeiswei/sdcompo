@@ -13,6 +13,13 @@ Requirements
 
 - Bash (tested on 4.2)
 
+- FLAC (1.3.0 has actually a bug and crashes at some point, I've been
+  using the development version as of 6 Oct 2014)
+
+  ```
+  git clone https://git.xiph.org/flac.git
+  ```
+
 - Git
 
 - Python 2.7
