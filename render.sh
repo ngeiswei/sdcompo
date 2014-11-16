@@ -218,6 +218,10 @@ bmx_pgr() {
     echo "wine \"$WIN32_PGR_DIR/Jeskola Buzz/Buzz.exe\""
 }
 
+mp3_pgr() {
+    echo "mpg123 -w $1/render.wav"
+}
+
 # Given the directory with the song, previously unpacked, identify the
 # entry, identify the tracker, return the tracker and the entry file
 # separated by whitespace.
@@ -235,6 +239,8 @@ find_unpacked_entry() {
         echo $(it_pgr "$it_files") "\"$(wine_path "$it_files")\""
     elif [[ "$bmx_files" ]]; then
         echo $(bmx_pgr "$bmx_files") "\"$(wine_path "$bmx_files")\""
+    elif [[ "$mp3_files" ]]; then
+        echo $(mp3_pgr "$TMP_DIR") \""$mp3_files\""
     else
         fatalError "Unknown tracker files in directory $TMP_DIR"
     fi
