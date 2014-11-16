@@ -227,10 +227,11 @@ mp3_pgr() {
 # separated by whitespace.
 find_unpacked_entry() {
     local TMP_DIR="$1"
-    xrns_files="$(ls $TMP_DIR/*.xrns 2> /dev/null)" # Renoise
-    psy_files="$(ls $TMP_DIR/*.psy 2> /dev/null)"   # Psycle
-    it_files="$(ls $TMP_DIR/*.it 2> /dev/null)"     # Impulse Tracker
-    bmx_files="$(ls $TMP_DIR/*.bmx 2> /dev/null)"   # Buzz Tracker
+    xrns_files="$(find $TMP_DIR -name "*.xrns")" # Renoise
+    psy_files="$(find $TMP_DIR -name "*.psy")"   # Psycle
+    it_files="$(find $TMP_DIR -name "*.it")"     # Impulse Tracker
+    bmx_files="$(find $TMP_DIR -name "*.bmx")"   # Buzz Tracker
+    mp3_files="$(find $TMP_DIR -name "*.mp3")"   # MP3 (WTF! Yes!)
     if [[ "$xrns_files" ]]; then
         echo $(renoise_pgr "$xrns_files") "\"$(wine_path "$xrns_files")\""
     elif [[ "$psy_files" ]]; then
