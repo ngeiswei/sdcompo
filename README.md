@@ -128,3 +128,10 @@ python script:
 ```
 
 where ROUND is obviously the number of the ROUND you wish to correct.
+
+TODO
+----
+
+1. Make upload-rounds.sh capable of adding entries to an identifier
+
+2. Make correct-ia-titles.py capable of correcting entries added later
