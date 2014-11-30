@@ -46,6 +46,28 @@ get_date() {
     done < <(tail -n+2 $METADATA)
 }
 
+# Given a prefix, pipe in and append the prefix to each line
+append() {
+    while read line; do
+        echo "${1}$line"
+    done
+}
+
+# Remove \r (convert end of line Windows format to unix, cause
+# internet archive returns lines in Windows format)
+d2u() {
+    tr -d '\r'
+}
+
+# Determine what files to upload (as to not duplicate the existing
+# ones). Happens the whole path while at it.
+files_to_upload() {
+    local render_path="$RENDERS_DIR/round$1"
+    comm -2 -3 \
+        <(ls "$render_path"/*.flac) \
+        <(ia list $identifier | d2u | grep '\.flac' | append "$render_path/")
+}
+
 ########
 # Main #
 ########
@@ -55,8 +77,9 @@ for rnd in $@; do
     date=$(get_date $rnd)
     year=${date%%-*}
     identifier=SDCompo_Round_${pad_rnd}
-    infoEcho "Upload rendered files to $identifier"
-    ia upload $identifier "$RENDERS_DIR"/round${rnd}/*.flac \
+    infoEcho "Upload rendered (not uploaded yet) files to $identifier"
+    ufiles=($(files_to_upload $rnd))
+    ia upload $identifier "${ufiles[@]}" \
         --metadata="creator:Various" \
         --metadata="mediatype:audio" \
         --metadata="collection:opensource_audio" \
