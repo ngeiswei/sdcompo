@@ -36,13 +36,16 @@ def main():
             author = d['author']
             padded_round = "{0:03d}".format(int(d['round']))
             title = d['title']
-            root_target_file = 'SDC' + padded_round + '-' + padded_place(place) \
-                + '_' + author + '_-_' + title.replace(' ', '_')
+
+            root_target_file = 'SDC' + padded_round + '-' \
+                + padded_place(place) + '_' + author + '_-_' \
+                + title.replace(' ', '_')
             target_file = 'files/' + root_target_file + ".flac"
             new_title = place + ' - ' + root_target_file
             md = {'title': new_title}
             item = get_item('SDCompo_Round_' + padded_round)
-            print "Round {} {}: '{}' -> '{}'".format(d['round'], author, title, new_title)
+            print "Round {} {}: '{}' -> '{}'".format(d['round'], author,
+                                                     title, new_title)
             item.modify_metadata(md, target=target_file)
 
 if __name__ == "__main__":
