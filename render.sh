@@ -344,3 +344,6 @@ while read row; do
     # Delete temporary
     rm -r "$tmp_dir"
 done < <(tail -n+2 $METADATA)
+
+infoEcho "All entries have been rendered. You may run"
+infoEcho "./upload-rounds.sh $ROUND"
