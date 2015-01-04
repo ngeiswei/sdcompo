@@ -37,6 +37,10 @@ def main():
             padded_round = "{0:03d}".format(int(d['round']))
             title = d['title']
 
+            # Don't try to correct empty entries
+            if author == 'SDCTester':
+                continue
+
             root_target_file = 'SDC' + padded_round + '-' \
                 + padded_place(place) + '_' + author + '_-_' \
                 + title.replace(' ', '_')
