@@ -275,6 +275,11 @@ while read row; do
         continue
     fi
 
+    # If the entry is produced by SDCTester (typically blank), skip it
+    if [[ $row_author == SDCTester ]]; then
+        continue
+    fi
+
     # Get the rest of the metadata
     row_date=$(get_value "$row" date)
     row_place=$(get_value "$row" place)
