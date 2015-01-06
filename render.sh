@@ -136,8 +136,8 @@ renoise_pgr() {
 # Parse an IT file and return its Cwt and Cmwt, whitespace separated
 it_cwt_cmwt() {
     local filename="$1"
-    local cwt=$(xxd -p -l 2 -seek 0x28 $filename)
-    local cmwt=$(xxd -p -l 2 -seek 0x2A $filename)
+    local cwt=$(xxd -p -l 2 -seek 0x28 "$filename")
+    local cmwt=$(xxd -p -l 2 -seek 0x2A "$filename")
     # Convert from big-endian to little-endian, because most
     # information on the internet about Cwt and Cmwt use little-endian
     cwt=${cwt#??}${cwt%??}
@@ -200,15 +200,15 @@ it_pgr() {
             ;;
         "0214 0214") echo "TODO: UNMO3"
             ;;
-        "0*") echo "TODO: Impulse Tracker"
+        0*) echo "TODO: Impulse Tracker"
             ;;
-        "1*") echo "TODO: Schism Tracker up v0.50"
+        1*) echo "TODO: Schism Tracker up v0.50"
             ;;
-        "5*") echo "wine \"$WIN32_PGR_DIR/OpenMPT/mptrack.exe\""
+        5*) echo "wine \"$WIN32_PGR_DIR/OpenMPT/mptrack.exe\""
             ;;
-        "6*") echo "TODO: BeRoTracker"
+        6*) echo "TODO: BeRoTracker"
             ;;
-        "7*") echo "TODO: ITMCK"
+        7*) echo "TODO: ITMCK"
             ;;
         *) fatalError "cwt cmw $cwt_cmwt not implemented"
             ;;
