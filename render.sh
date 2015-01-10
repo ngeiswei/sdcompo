@@ -147,6 +147,10 @@ it_cwt_cmwt() {
 
 # Map Psycle file to Psycle player program path
 psy_pgr() {
+    echo "It seems there is no difference in rendering between different"
+    echo "versions of psycle. Nevertheless it is adviced to tried"
+    echo "the last version and the one just before the song was submitted"
+    echo "and compare (subtracting the signal), just in case."
     echo "wine \"$WIN32_PGR_DIR/Psycle Modular Music Studio/psycle.exe\""
 }
 
