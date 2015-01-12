@@ -206,7 +206,7 @@ it_pgr() {
             ;;
         0*) echo "TODO: Impulse Tracker"
             ;;
-        1*) echo "TODO: Schism Tracker up v0.50"
+        1*) echo "schism"
             ;;
         5*) echo "wine \"$WIN32_PGR_DIR/OpenMPT/mptrack.exe\""
             ;;
@@ -239,15 +239,20 @@ find_unpacked_entry() {
     bmx_files="$(find $TMP_DIR -name "*.bmx")"   # Buzz Tracker
     mp3_files="$(find $TMP_DIR -name "*.mp3")"   # MP3 (WTF! Yes!)
     if [[ "$xrns_files" ]]; then
-        echo $(renoise_pgr "$xrns_files") "\"$(wine_path "$xrns_files")\""
+        echo "$(renoise_pgr "$xrns_files")" "\"$(wine_path "$xrns_files")\""
     elif [[ "$psy_files" ]]; then
-        echo $(psy_pgr "$psy_files") "\"$(wine_path "$psy_files")\""
+        echo "$(psy_pgr "$psy_files")" "\"$(wine_path "$psy_files")\""
     elif [[ "$it_files" ]]; then
-        echo $(it_pgr "$it_files") "\"$(wine_path "$it_files")\""
+        prg_path="$(it_pgr "$it_files")"
+        if [[ $prg_path == schism ]]; then
+            echo "$prg_path" "$it_files"
+        else
+            echo "$prg_path" "\"$(wine_path "$it_files")\""
+        fi
     elif [[ "$bmx_files" ]]; then
-        echo $(bmx_pgr "$bmx_files") "\"$(wine_path "$bmx_files")\""
+        echo "$(bmx_pgr "$bmx_files")" "\"$(wine_path "$bmx_files")\""
     elif [[ "$mp3_files" ]]; then
-        echo $(mp3_pgr "$TMP_DIR") \""$mp3_files\""
+        echo "$(mp3_pgr "$TMP_DIR")" \""$mp3_files\""
     else
         fatalError "Unknown tracker files in directory $TMP_DIR"
     fi
