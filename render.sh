@@ -43,6 +43,7 @@ CM_DIR="$PROG_DIR"
 #############
 
 WIN32_PGR_DIR="/home/$USER/.wine/drive_c/Program Files (x86)"
+WIN64_PGR_DIR="/home/$USER/.wine/drive_c/Program Files"
 
 #############
 # Functions #
@@ -127,6 +128,8 @@ renoise_pgr() {
         22) echo "wine \"$WIN32_PGR_DIR/Renoise 2.6.1/Renoise.exe\""
             ;;
         30) echo "wine \"$WIN32_PGR_DIR/Renoise 2.7.2/Renoise.exe\""
+            ;;
+        37) echo "wine \"$WIN64_PGR_DIR/Renoise 2.8.2/Renoise.exe\""
             ;;
         *)  fatalError "doc_string $doc_string not implemented"
             ;;
