@@ -42,8 +42,8 @@ CM_DIR="$PROG_DIR"
 # Constants #
 #############
 
-WIN32_PGR_DIR="/home/$USER/.wine/drive_c/Program Files (x86)"
-WIN64_PGR_DIR="/home/$USER/.wine/drive_c/Program Files"
+WIN32_PRG_DIR="/home/$USER/.wine/drive_c/Program Files (x86)"
+WIN64_PRG_DIR="/home/$USER/.wine/drive_c/Program Files"
 
 #############
 # Functions #
@@ -79,7 +79,7 @@ unpack() {
     local zip_re='(zip|ZIP)$'
     local tgz_re='tar\.gz$'
     local tbz_re='tar\.bz$'
-    local copy_re='(xrns|it|psy)$'
+    local copy_re='(xrns|it|psy|sunvox)$'
     if [[ "$filename" =~ $rar_re ]]; then
         # Unrar
         unrar e "$filename" "$tmp_dir" &> /dev/null
@@ -116,24 +116,29 @@ renoise_doc_version() {
 }
 
 # Map Renoise file to Renoise program path
-renoise_pgr() {
+renoise_prg() {
     local doc_string="$(renoise_doc_version "$1")"
     case $doc_string in
-        10) echo "wine \"$WIN32_PGR_DIR/Renoise 1.9.1/Renoise.exe\""
+        10) echo "wine \"$WIN32_PRG_DIR/Renoise 1.9.1/Renoise.exe\""
             ;;
-        14) echo "wine \"$WIN32_PGR_DIR/Renoise 2.0.0/Renoise.exe\""
+        14) echo "wine \"$WIN32_PRG_DIR/Renoise 2.0.0/Renoise.exe\""
             ;;
-        21) echo "wine \"$WIN32_PGR_DIR/Renoise 2.5.1/Renoise.exe\""
+        21) echo "wine \"$WIN32_PRG_DIR/Renoise 2.5.1/Renoise.exe\""
             ;;
-        22) echo "wine \"$WIN32_PGR_DIR/Renoise 2.6.1/Renoise.exe\""
+        22) echo "wine \"$WIN32_PRG_DIR/Renoise 2.6.1/Renoise.exe\""
             ;;
-        30) echo "wine \"$WIN32_PGR_DIR/Renoise 2.7.2/Renoise.exe\""
+        30) echo "wine \"$WIN32_PRG_DIR/Renoise 2.7.2/Renoise.exe\""
             ;;
-        37) echo "wine \"$WIN64_PGR_DIR/Renoise 2.8.2/Renoise.exe\""
+        37) echo "wine \"$WIN64_PRG_DIR/Renoise 2.8.2/Renoise.exe\""
             ;;
         *)  fatalError "doc_string $doc_string not implemented"
             ;;
     esac
+}
+
+# Map Renoise file to Renoise program path
+sunvox_prg() {
+    echo "sunvox"
 }
 
 # Parse an IT file and return its Cwt and Cmwt, whitespace separated
@@ -149,16 +154,16 @@ it_cwt_cmwt() {
 }
 
 # Map Psycle file to Psycle player program path
-psy_pgr() {
+psy_prg() {
     echo "It seems there is no difference in rendering between different"
     echo "versions of psycle. Nevertheless it is adviced to tried"
     echo "the last version and the one just before the song was submitted"
     echo "and compare (subtracting the signal), just in case."
-    echo "wine \"$WIN32_PGR_DIR/Psycle Modular Music Studio/psycle.exe\""
+    echo "wine \"$WIN32_PRG_DIR/Psycle Modular Music Studio/psycle.exe\""
 }
 
 # Map IT file to IT player program path
-it_pgr() {
+it_prg() {
     cwt_cmwt="$(it_cwt_cmwt "$1")"
 
     # Info gathered about cwt and cmwt
@@ -201,7 +206,7 @@ it_pgr() {
     # IT modules, which means from now on all saved S3M and IT
     # modules will have the new CWT TrackerVersion ID.
     case "$cwt_cmwt" in
-        "0888 0888") echo "wine \"$WIN32_PGR_DIR/OpenMPT/mptrack.exe\""
+        "0888 0888") echo "wine \"$WIN32_PRG_DIR/OpenMPT/mptrack.exe\""
             ;;
         "0214 0200") echo "TODO: OpenSPC"
             ;;
@@ -211,7 +216,7 @@ it_pgr() {
             ;;
         1*) echo "schism"
             ;;
-        5*) echo "wine \"$WIN32_PGR_DIR/OpenMPT/mptrack.exe\""
+        5*) echo "wine \"$WIN32_PRG_DIR/OpenMPT/mptrack.exe\""
             ;;
         6*) echo "TODO: BeRoTracker"
             ;;
@@ -223,11 +228,11 @@ it_pgr() {
 }
 
 # Map IT file to IT player program path
-bmx_pgr() {
-    echo "wine \"$WIN32_PGR_DIR/Jeskola Buzz/Buzz.exe\""
+bmx_prg() {
+    echo "wine \"$WIN32_PRG_DIR/Jeskola Buzz/Buzz.exe\""
 }
 
-mp3_pgr() {
+mp3_prg() {
     echo "mpg123 -w $1/render.wav"
 }
 
@@ -236,26 +241,29 @@ mp3_pgr() {
 # separated by whitespace.
 find_unpacked_entry() {
     local TMP_DIR="$1"
-    xrns_files="$(find $TMP_DIR -name "*.xrns")" # Renoise
-    psy_files="$(find $TMP_DIR -name "*.psy")"   # Psycle
-    it_files="$(find $TMP_DIR -name "*.it")"     # Impulse Tracker
-    bmx_files="$(find $TMP_DIR -name "*.bmx")"   # Buzz Tracker
-    mp3_files="$(find $TMP_DIR -name "*.mp3")"   # MP3 (WTF! Yes!)
+    xrns_files="$(find $TMP_DIR -name "*.xrns")"     # Renoise
+    sunvox_files="$(find $TMP_DIR -name "*.sunvox")" # Sunvox
+    psy_files="$(find $TMP_DIR -name "*.psy")"       # Psycle
+    it_files="$(find $TMP_DIR -name "*.it")"         # Impulse Tracker
+    bmx_files="$(find $TMP_DIR -name "*.bmx")"       # Buzz Tracker
+    mp3_files="$(find $TMP_DIR -name "*.mp3")"       # MP3 (WTF! Yes!)
     if [[ "$xrns_files" ]]; then
-        echo "$(renoise_pgr "$xrns_files")" "\"$(wine_path "$xrns_files")\""
+        echo "$(renoise_prg "$xrns_files")" "\"$(wine_path "$xrns_files")\""
+    elif [[ "$sunvox_files" ]]; then
+        echo "$(sunvox_prg "$sunvox_files")" "$sunvox_files"
     elif [[ "$psy_files" ]]; then
-        echo "$(psy_pgr "$psy_files")" "\"$(wine_path "$psy_files")\""
+        echo "$(psy_prg "$psy_files")" "\"$(wine_path "$psy_files")\""
     elif [[ "$it_files" ]]; then
-        prg_path="$(it_pgr "$it_files")"
+        prg_path="$(it_prg "$it_files")"
         if [[ $prg_path == schism ]]; then
             echo "$prg_path" "$it_files"
         else
             echo "$prg_path" "\"$(wine_path "$it_files")\""
         fi
     elif [[ "$bmx_files" ]]; then
-        echo "$(bmx_pgr "$bmx_files")" "\"$(wine_path "$bmx_files")\""
+        echo "$(bmx_prg "$bmx_files")" "\"$(wine_path "$bmx_files")\""
     elif [[ "$mp3_files" ]]; then
-        echo "$(mp3_pgr "$TMP_DIR")" \""$mp3_files\""
+        echo "$(mp3_prg "$TMP_DIR")" \""$mp3_files\""
     else
         fatalError "Unknown tracker files in directory $TMP_DIR"
     fi
