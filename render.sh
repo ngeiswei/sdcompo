@@ -88,10 +88,10 @@ unpack() {
         unzip -qq "$filename" -d "$tmp_dir"
     elif [[ "$filename" =~ $tgz_re ]]; then
         # Untar gz
-        tar xvjf "$filename" -C "$tmp_dir"
+        tar xvzf "$filename" -C "$tmp_dir"
     elif [[ "$filename" =~ $tbz_re ]]; then
         # Untar bz
-        fatalError "tar.bz format not implemented yet"
+        tar xvjf "$filename" -C "$tmp_dir"
     elif [[ "$filename" =~ $copy_re ]]; then
         # Merely copy
         cp "$filename" "$tmp_dir"
@@ -155,10 +155,10 @@ it_cwt_cmwt() {
 
 # Map Psycle file to Psycle player program path
 psy_prg() {
-    echo "It seems there is no difference in rendering between different"
-    echo "versions of psycle. Nevertheless it is adviced to tried"
-    echo "the last version and the one just before the song was submitted"
-    echo "and compare (subtracting the signal), just in case."
+    # It seems there is no difference in rendering between different
+    # versions of psycle. Nevertheless it is adviced to tried the last
+    # version and the one just before the song was submitted and
+    # compare (subtracting the signal), just in case.
     echo "wine \"$WIN32_PRG_DIR/Psycle Modular Music Studio/psycle.exe\""
 }
 
@@ -329,7 +329,7 @@ while read row; do
 
     # Get the actual path
     filename="$(find "$ENTRIES_DIR/$RND" -name "$row_filename")"
-    
+
     # Unpack the entry into a temporary directory
     tmp_dir="$(unpack "$filename")"
 
