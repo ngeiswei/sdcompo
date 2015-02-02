@@ -88,10 +88,10 @@ unpack() {
         unzip -qq "$filename" -d "$tmp_dir"
     elif [[ "$filename" =~ $tgz_re ]]; then
         # Untar gz
-        tar xvzf "$filename" -C "$tmp_dir"
+        tar xvzf "$filename" -C "$tmp_dir" > /dev/null
     elif [[ "$filename" =~ $tbz_re ]]; then
         # Untar bz
-        tar xvjf "$filename" -C "$tmp_dir"
+        tar xvjf "$filename" -C "$tmp_dir" > /dev/null
     elif [[ "$filename" =~ $copy_re ]]; then
         # Merely copy
         cp "$filename" "$tmp_dir"
@@ -340,9 +340,9 @@ while read row; do
     echo "Please render the song in 44KHz 24-bit and save the result under $tmp_dir as a wav file. If some wav files are already there then you may save it as render.wav to disambiguate"
     eval "$CMD 1> $tmp_dir/tracker.stdout 2> $tmp_dir/tracker.stderr"
 
-    if [[ $? != 0 ]]; then
-        fatalError "$CMD failed. You may have a look at $tmp_dir/tracker.stderr to understand what went wrong"
-    fi
+    # if [[ $? != 0 ]]; then
+    #     fatalError "$CMD failed. You may have a look at $tmp_dir/tracker.stderr to understand what went wrong"
+    # fi
 
     # Look for the rendered file
     if [[ -f "$tmp_dir/render.wav" ]]; then
