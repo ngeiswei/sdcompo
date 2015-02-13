@@ -8,6 +8,15 @@ readonly ENTRIES_DIR="entries"
 readonly RENDERS_DIR="renders"
 readonly METADATA="metadata_rnd_1_to_86.csv"
 
+# Regular expression for parsing the CSV rows
+readonly round_re='([[:digit:]]+)'
+readonly date_re='([[:digit:]]{4}-[[:digit:]]{2}-[[:digit:]]{2})'
+readonly place_re='([[:alnum:]]+)'
+readonly author_re='([^,]+)'
+readonly title_re='"(.+)"'
+readonly file_re='"(.+)"'
+readonly row_re="^$round_re,$date_re,$place_re,$author_re,$title_re,$file_re\$"
+
 #############
 # Functions #
 #############
@@ -29,7 +38,7 @@ fatalError() {
 # pad $1 symbol with up to $2 0s
 pad() {
     pad_expression="%0${2}d"
-    printf "$pad_expression" "$1"    
+    printf "$pad_expression" "$1"
 }
 
 # Given
@@ -41,15 +50,8 @@ pad() {
 # Return the value corresponding to that field. Possible fields are:
 # round, date, place, author, title, filename
 get_value() {
-    row="$1"
-    field="$2"
-    round_re='([[:digit:]]+)'
-    date_re='([[:digit:]]{4}-[[:digit:]]{2}-[[:digit:]]{2})'
-    place_re='([[:alnum:]]+)'
-    author_re='([^,]+)'
-    title_re='"(.+)"'
-    file_re='"(.+)"'
-    row_re="^$round_re,$date_re,$place_re,$author_re,$title_re,$file_re\$"
+    local row="$1"
+    local field="$2"
     if [[ $row =~ $row_re ]]; then
         if [[ $field == round ]]; then
             echo "${BASH_REMATCH[1]}"
