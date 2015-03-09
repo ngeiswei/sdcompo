@@ -95,6 +95,11 @@ and automatically launch the right tracker (at its right version) for
 each one. The result will be a flac file for each entry under the
 folder
 
+Note that it is possible that some filenames have been corrupted
+during ftp transfer, in particular names using spanish accents or
+such, you may therefore need to correct those filenames by using the
+ones in the meta-data CSV file as reference.
+
 ``` entries ```
 
 Upload Rounds
