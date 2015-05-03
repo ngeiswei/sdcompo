@@ -227,9 +227,14 @@ it_prg() {
     esac
 }
 
-# Map IT file to IT player program path
+# Map bnx file to buzz player program path
 bmx_prg() {
     echo "wine \"$WIN32_PRG_DIR/Jeskola Buzz/Buzz.exe\""
+}
+
+# Map mt2 file to madtracker 2 program path
+mt2_prg() {
+    echo "wine \"$WIN32_PRG_DIR/MadTracker/MT2.exe\""
 }
 
 mp3_prg() {
@@ -246,6 +251,7 @@ find_unpacked_entry() {
     psy_files="$(find $TMP_DIR -name "*.psy")"       # Psycle
     it_files="$(find $TMP_DIR -name "*.it")"         # Impulse Tracker
     bmx_files="$(find $TMP_DIR -name "*.bmx")"       # Buzz Tracker
+    mt2_files="$(find $TMP_DIR -name "*.mt2")"       # MadTracker 2
     mp3_files="$(find $TMP_DIR -name "*.mp3")"       # MP3 (WTF! Yes!)
     if [[ "$xrns_files" ]]; then
         echo "$(renoise_prg "$xrns_files")" "\"$(wine_path "$xrns_files")\""
@@ -262,6 +268,8 @@ find_unpacked_entry() {
         fi
     elif [[ "$bmx_files" ]]; then
         echo "$(bmx_prg "$bmx_files")" "\"$(wine_path "$bmx_files")\""
+    elif [[ "$mt2_files" ]]; then
+        echo "$(mt2_prg "$mt2_files")" "\"$(wine_path "$mt2_files")\""
     elif [[ "$mp3_files" ]]; then
         echo "$(mp3_prg "$TMP_DIR")" \""$mp3_files\""
     else
