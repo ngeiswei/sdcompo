@@ -12,4 +12,4 @@
 75 (Buzz)
 76 (Buzz)
 77 (Buzz)
-78 (need Voxengo: SPAN VST)
+79 (ogg file, no tracker file)
