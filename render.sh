@@ -131,6 +131,8 @@ renoise_prg() {
             ;;
         37) echo "wine \"$WIN64_PRG_DIR/Renoise 2.8.2/Renoise.exe\""
             ;;
+        54) echo "wine \"$WIN64_PRG_DIR/Renoise 3.0.1/Renoise.exe\""
+            ;;
         *)  fatalError "doc_string $doc_string not implemented"
             ;;
     esac
