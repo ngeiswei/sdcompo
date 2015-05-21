@@ -340,6 +340,10 @@ while read row; do
     # Get the actual path
     filename="$(find "$ENTRIES_DIR/$RND" -name "$row_filename")"
 
+    if [[ -z "$filename" ]]; then
+        fatalError "Cannot find entry $row_filename anywhere under $ENTRIES_DIR/$RND"
+    fi
+
     # Unpack the entry into a temporary directory
     tmp_dir="$(unpack "$filename")"
 
