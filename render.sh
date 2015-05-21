@@ -75,11 +75,12 @@ unpack() {
     local tmp_dir=$(mktemp -d SDCompo.XXXXX)
 
     # Unpack the entry in that directory
-    local rar_re='(rar|RAR)$'
-    local zip_re='(zip|ZIP)$'
-    local tgz_re='tar\.gz$'
-    local tbz_re='tar\.bz$'
-    local copy_re='(xrns|it|psy|sunvox)$'
+    local rar_re='\.(rar|RAR)$'
+    local zip_re='\.(zip|ZIP)$'
+    local tgz_re='\.tar\.gz$'
+    local gz_re='\.gz$'
+    local tbz_re='\.tar\.bz$'
+    local copy_re='\.(xrns|it|psy|sunvox)$'
     if [[ "$filename" =~ $rar_re ]]; then
         # Unrar
         unrar e "$filename" "$tmp_dir" &> /dev/null
@@ -89,6 +90,10 @@ unpack() {
     elif [[ "$filename" =~ $tgz_re ]]; then
         # Untar gz
         tar xvzf "$filename" -C "$tmp_dir" > /dev/null
+    elif [[ "$filename" =~ $gz_re ]]; then
+        # Gunzip
+        stem="$(basename "$filename" .gz)"
+        gunzip -c "$filename" > "$tmp_dir/$stem"
     elif [[ "$filename" =~ $tbz_re ]]; then
         # Untar bz
         tar xvjf "$filename" -C "$tmp_dir" > /dev/null
