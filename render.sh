@@ -128,6 +128,8 @@ renoise_prg() {
             ;;
         14) echo "wine \"$WIN32_PRG_DIR/Renoise 2.0.0/Renoise.exe\""
             ;;
+        15) echo "wine \"$WIN32_PRG_DIR/Renoise 2.1.0/Renoise.exe\""
+            ;;
         21) echo "wine \"$WIN32_PRG_DIR/Renoise 2.5.1/Renoise.exe\""
             ;;
         22) echo "wine \"$WIN32_PRG_DIR/Renoise 2.6.1/Renoise.exe\""
