@@ -236,6 +236,23 @@ it_prg() {
     esac
 }
 
+# Giveb an XM filepath, return the tracker program name, with the
+# revision numbers (hi-byte, then low-byte) all separated by
+# whitespaces
+xm_tracker_revision() {
+    local filename="$1"
+    local tracker=$(xxd -p -l 20 -seek 0x26 "$filename")
+    local hirev=$(xxd -p -l 1 -seek 0x3A "$filename") 
+    local lowrev=$(xxd -p -l 1 -seek 0x3B "$filename")
+    echo "$tracker $hirev $lowrev"
+}
+
+# Map XM file to the right XM player program path
+xm_prg() {
+    local tracker_hirev_lowrev=$(xm_tracker_revision "$1")
+    echo "$tracker_hirev_lowrev"
+}
+
 # Map bnx file to buzz player program path
 bmx_prg() {
     echo "wine \"$WIN32_PRG_DIR/Jeskola Buzz/Buzz.exe\""
