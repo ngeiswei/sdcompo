@@ -23,7 +23,7 @@
 77 (Buzz)
 79 (ogg file, no tracker file)
 80 (Psycle - freezes)
-81 (Needs to add support for XM)
+81 (Prb with OrganicIO entry + Needs to add support for XM)
 84 (Psycle - freezes)
 85 (Cannot find entry sdc85_rawspectra-Spaß².rar, probably a weird name)
 87 (can't upload!)
