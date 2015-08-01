@@ -56,6 +56,7 @@ Preparation
 
     ```
     mkdir entries
+    cd entries
     wget --no-host-directories -r --user=USER --password=PASS ftp://sdcompo.com/round{LOW_RND..UP_RND}
 
     ```
@@ -65,8 +66,8 @@ Preparation
 
 3. Generate the metadata
 
-    A metadata file is provided here (metadata_rnd_1_to_85.csv), but
-    in case you need to re-generate it, do the following
+    A metadata file is provided here (metadata_rnd_1_to_89.csv), but
+    in case you need to re-generate it, do as follows
 
     ```
     ./build-metadata.sh LOW_RND UP_RND > metadata_rnd_LOW_RND_to_UP_RND.csv
@@ -137,6 +138,4 @@ where ROUND is obviously the number of the ROUND you wish to correct.
 TODO
 ----
 
-1. Make upload-rounds.sh capable of adding entries to an identifier
-
-2. Make correct-ia-titles.py capable of correcting entries added later
+-[ ] Make correct-ia-titles.py capable of correcting entries added later
