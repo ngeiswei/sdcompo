@@ -241,7 +241,7 @@ it_prg() {
 # whitespaces
 xm_tracker_revision() {
     local filename="$1"
-    local tracker=$(xxd -p -l 20 -seek 0x26 "$filename")
+    local tracker=$(xxd -c 20 -l 20 -seek 0x26 "$filename" | cut -f 13 -d ' ')
     local hirev=$(xxd -p -l 1 -seek 0x3A "$filename") 
     local lowrev=$(xxd -p -l 1 -seek 0x3B "$filename")
     echo "$tracker $hirev $lowrev"
@@ -250,7 +250,12 @@ xm_tracker_revision() {
 # Map XM file to the right XM player program path
 xm_prg() {
     local tracker_hirev_lowrev=$(xm_tracker_revision "$1")
-    echo "$tracker_hirev_lowrev"
+    case $tracker_hirev_lowrev in
+        MilkyTrack*) echo "milkytracker"
+            ;;
+        *)  fatalError "tracker_hirev_lowrev $tracker_hirev_lowrev not implemented"
+            ;;
+    esac
 }
 
 # Map bnx file to buzz player program path
@@ -276,6 +281,7 @@ find_unpacked_entry() {
     sunvox_files="$(find $TMP_DIR -name "*.sunvox")" # Sunvox
     psy_files="$(find $TMP_DIR -name "*.psy")"       # Psycle
     it_files="$(find $TMP_DIR -name "*.it")"         # Impulse Tracker
+    xm_files="$(find $TMP_DIR -name "*.xm")"         # Fasttracker 2
     bmx_files="$(find $TMP_DIR -name "*.bmx")"       # Buzz Tracker
     mt2_files="$(find $TMP_DIR -name "*.mt2")"       # MadTracker 2
     mp3_files="$(find $TMP_DIR -name "*.mp3")"       # MP3 (WTF! Yes!)
@@ -292,6 +298,8 @@ find_unpacked_entry() {
         else
             echo "$prg_path" "\"$(wine_path "$it_files")\""
         fi
+    elif [[ "$xm_files" ]]; then
+        echo "$(xm_prg "$xm_files")" "$xm_files"
     elif [[ "$bmx_files" ]]; then
         echo "$(bmx_prg "$bmx_files")" "\"$(wine_path "$bmx_files")\""
     elif [[ "$mt2_files" ]]; then
