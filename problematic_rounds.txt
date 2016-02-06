@@ -1,5 +1,3 @@
-39 (can't correct all titles)
-42 (uploading problems [name problem])
 45 (need Kore Player)
 46 (Melodyne)
 47 (too many plugins needed)
@@ -10,6 +8,5 @@
 69 (too many plugins needed)
 71 (need Zampler VST)
 73 (need ValhallaRoom)
-76 (another MDA DX10)
+76 (need TDRFeedbackCompressorII)
 79 (Requires AU)
-85 (can't correct all titles)
