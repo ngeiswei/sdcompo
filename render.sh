@@ -138,6 +138,8 @@ renoise_prg() {
             ;;
         37) echo "wine \"$WIN64_PRG_DIR/Renoise 2.8.2/Renoise.exe\""
             ;;
+        53) echo "wine \"$WIN64_PRG_DIR/Renoise 3.0.0/Renoise.exe\""
+            ;;
         54) echo "wine \"$WIN64_PRG_DIR/Renoise 3.0.1/Renoise.exe\""
             ;;
         *)  fatalError "doc_string $doc_string not implemented"
@@ -272,6 +274,10 @@ mp3_prg() {
     echo "mpg123 -w $1/render.wav"
 }
 
+ogg_prg() {
+    echo "ogg123 -d wav -f $1/render.wav"
+}
+
 # Given the directory with the song, previously unpacked, identify the
 # entry, identify the tracker, return the tracker and the entry file
 # separated by whitespace.
@@ -284,7 +290,12 @@ find_unpacked_entry() {
     xm_files="$(find $TMP_DIR -name "*.xm")"         # Fasttracker 2
     bmx_files="$(find $TMP_DIR -name "*.bmx")"       # Buzz Tracker
     mt2_files="$(find $TMP_DIR -name "*.mt2")"       # MadTracker 2
-    mp3_files="$(find $TMP_DIR -name "*.mp3")"       # MP3 (WTF! Yes!)
+
+    # In case there is nothing but already rendered entries (author's
+    # mistake)
+    mp3_files="$(find $TMP_DIR -name "*.mp3")"
+    ogg_files="$(find $TMP_DIR -name "*.ogg")"
+
     if [[ "$xrns_files" ]]; then
         echo "$(renoise_prg "$xrns_files")" "\"$(wine_path "$xrns_files")\""
     elif [[ "$sunvox_files" ]]; then
@@ -306,6 +317,8 @@ find_unpacked_entry() {
         echo "$(mt2_prg "$mt2_files")" "\"$(wine_path "$mt2_files")\""
     elif [[ "$mp3_files" ]]; then
         echo "$(mp3_prg "$TMP_DIR")" \""$mp3_files\""
+    elif [[ "$ogg_files" ]]; then
+        echo "$(ogg_prg "$TMP_DIR")" \""$ogg_files\""
     else
         fatalError "Unknown tracker files in directory $TMP_DIR"
     fi
