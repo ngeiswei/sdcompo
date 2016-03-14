@@ -411,7 +411,17 @@ while read row; do
         if [[ $RENDER_FILE ]]; then
             echo "There is no $tmp_dir/render.wav, instead $RENDER_FILE will be used"
         else
-            fatalError "Cannot find any render file"
+            read -e -p "No render file, if you have one anyway you may still move it to $tmp_dir. Do you wish to use a now moved file [Y/n]? " answer </dev/tty
+            if [[ -z $answer || $answer =~ Y|y ]]; then
+                RENDER_FILE=$(ls $tmp_dir/*.wav)
+                if [[ $RENDER_FILE ]]; then
+                    echo "OK, will use $RENDER_FILE then"
+                else
+                    fatalError "Cannot find any render file"
+                fi
+            else
+                fatalError "Cannot find any render file"
+            fi
         fi
     fi
 
