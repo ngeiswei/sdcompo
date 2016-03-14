@@ -58,13 +58,20 @@ Preparation
     mkdir entries
     cd entries
     wget --no-host-directories -r --user=USER --password=PASS ftp://sdcompo.com/round{LOW_RND..UP_RND}
-
+    cd ..
     ```
 
     where LOW_RND and UP_RND is the closed interval of rounds to
     download. You're supposed to know what USER and PASS are. 
 
-3. Generate the metadata
+3. [Optional] Download the samplepacks from the ftp. This can be very
+   convenient because the samplepacks also contain some legacy plugins
+
+    ```
+    wget --no-host-directories -r --user=USER --password=PASS ftp://sdcompo.com/samplepacks
+    ```
+
+4. Generate the metadata
 
     A metadata file is provided here (metadata_rnd_1_to_89.csv), but
     in case you need to re-generate it, do as follows
