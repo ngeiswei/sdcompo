@@ -6,7 +6,5 @@
 62 (Saviour by ambtax1, need KORG Polysix VST)
 67 (this one by ambtax1, need Elek7ro-II VST)
 68 (token taken by keith303, need Ozone 5 VST)
-69 (Could Be (feat. Jenny Mayhem) by hexmode, Psycle)
-71 (Seventy Oneing by flipbit03, need Zampler VST)
 73 (Honjin by francis_red, need ValhallaRoom)
 76 (SOON by hiroshi909808, need TDRFeedbackCompressorII)
