@@ -79,19 +79,23 @@ for rnd in $@; do
     identifier=SDCompo_Round_${pad_rnd}
     infoEcho "Upload rendered (not uploaded yet) files to $identifier"
     ufiles=($(files_to_upload $rnd))
-    ia upload $identifier "${ufiles[@]}" \
-        --metadata="creator:Various" \
-        --metadata="mediatype:audio" \
-        --metadata="collection:opensource_audio" \
-        --metadata="date:$date" \
-        --metadata="licenseurl:http://creativecommons.org/licenses/by-nc-nd/3.0/" \
-        --metadata="description:Round $rnd of the SounDevotion Competition, visit http://sdcompo.com for details on songs and artists." \
-        --metadata="subject:SounDevotion" \
-        --metadata="subject:compo" \
-        --metadata="subject:tracker" \
-        --metadata="subject:demoscene" \
-        --metadata="year:$year"
+    if [[ ${#ufiles[@]} -eq 0 ]]; then
+        infoEcho "Nothing new to upload"
+    else
+        ia upload $identifier "${ufiles[@]}" \
+            --metadata="creator:Various" \
+            --metadata="mediatype:audio" \
+            --metadata="collection:opensource_audio" \
+            --metadata="date:$date" \
+            --metadata="licenseurl:http://creativecommons.org/licenses/by-nc-nd/3.0/" \
+            --metadata="description:Round $rnd of the SounDevotion Competition, visit http://sdcompo.com for details on songs and artists." \
+            --metadata="subject:SounDevotion" \
+            --metadata="subject:compo" \
+            --metadata="subject:tracker" \
+            --metadata="subject:demoscene" \
+            --metadata="year:$year"
 
-    infoEcho "Round $rnd has been uploaded, wait for a few hours then run"
-    infoEcho "./correct-ia-titles.py $rnd"
+        infoEcho "Round $rnd has been uploaded, wait for a few hours then run"
+        infoEcho "./correct-ia-titles.py $rnd"
+    fi
 done
