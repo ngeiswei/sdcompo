@@ -124,6 +124,8 @@ renoise_doc_version() {
 renoise_prg() {
     local doc_string="$(renoise_doc_version "$1")"
     case $doc_string in
+        9) echo "wine \"$WIN32_PRG_DIR/Renoise 1.9.0/Renoise.exe\""
+            ;;
         10) echo "wine \"$WIN32_PRG_DIR/Renoise 1.9.1/Renoise.exe\""
             ;;
         14) echo "wine \"$WIN32_PRG_DIR/Renoise 2.0.0/Renoise.exe\""
