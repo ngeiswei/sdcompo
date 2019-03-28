@@ -1,7 +1,18 @@
-41 (Morgenstimmung_sim-Remix by sim)
-45 (track with no name at 128bpm by dark_virus, Psycle)
-47 (The One And Only by Airmann, need FerricDTS15b2 VST)
-48 (Tracker by Sam, need MadTracker II)
-65 (Error about ogg samples)
-67 (Skips / Quavers by hexmode, need Psycle)
-88 (Script shit)
+Round 41:
+- Morgenstimmung_sim-Remix by sim, need SUPERWAVEP8 VST
+- sete pés.xrns by emeu, need Absynth4 VST
+- Markos_CanonVariation.psy by Markos, need Psycle
+Round 45:
+- track with no name at 128bpm by dark_virus, need Psycle
+Round 47:
+- The One And Only by Airmann, need FerricDTS15b2 VST
+- TODO: Impulse Tracker
+Round 48:
+- Tracker by Sam, need MadTracker II
+Round 65:
+- Error about ogg samples
+- dummy entry ???
+Round 67:
+- Skips / Quavers by hexmode, need Psycle
+Round 88:
+- Script shit
