@@ -80,7 +80,7 @@ unpack() {
     local tgz_re='\.tar\.gz$'
     local gz_re='\.gz$'
     local tbz_re='\.tar\.bz$'
-    local copy_re='\.(xrns|it|psy|sunvox)$'
+    local copy_re='\.(xrns|it|IT|psy|sunvox)$'
     if [[ "$filename" =~ $rar_re ]]; then
         # Unrar
         unrar e "$filename" "$tmp_dir" &> /dev/null
@@ -227,7 +227,7 @@ it_prg() {
             ;;
         0*) echo "TODO: Impulse Tracker"
             ;;
-        1*) echo "schism"
+        1*) echo "schismtracker"
             ;;
         5*) echo "wine \"$WIN32_PRG_DIR/OpenMPT/mptrack.exe\""
             ;;
@@ -285,13 +285,13 @@ ogg_prg() {
 # separated by whitespace.
 find_unpacked_entry() {
     local TMP_DIR="$1"
-    xrns_files="$(find $TMP_DIR -name "*.xrns")"     # Renoise
-    sunvox_files="$(find $TMP_DIR -name "*.sunvox")" # Sunvox
-    psy_files="$(find $TMP_DIR -name "*.psy")"       # Psycle
-    it_files="$(find $TMP_DIR -name "*.it")"         # Impulse Tracker
-    xm_files="$(find $TMP_DIR -name "*.xm")"         # Fasttracker 2
-    bmx_files="$(find $TMP_DIR -name "*.bmx")"       # Buzz Tracker
-    mt2_files="$(find $TMP_DIR -name "*.mt2")"       # MadTracker 2
+    xrns_files="$(find $TMP_DIR -name "*.xrns")"             # Renoise
+    sunvox_files="$(find $TMP_DIR -name "*.sunvox")"         # Sunvox
+    psy_files="$(find $TMP_DIR -name "*.psy")"               # Psycle
+    it_files="$(find $TMP_DIR -name "*.it" -o -name "*.IT")" # Impulse Tracker
+    xm_files="$(find $TMP_DIR -name "*.xm")"                 # Fasttracker 2
+    bmx_files="$(find $TMP_DIR -name "*.bmx")"               # Buzz Tracker
+    mt2_files="$(find $TMP_DIR -name "*.mt2")"               # MadTracker 2
 
     # In case there is nothing but already rendered entries (author's
     # mistake)
@@ -306,7 +306,7 @@ find_unpacked_entry() {
         echo "$(psy_prg "$psy_files")" "\"$(wine_path "$psy_files")\""
     elif [[ "$it_files" ]]; then
         prg_path="$(it_prg "$it_files")"
-        if [[ $prg_path == schism ]]; then
+        if [[ $prg_path == schismtracker ]]; then
             echo "$prg_path" "$it_files"
         else
             echo "$prg_path" "\"$(wine_path "$it_files")\""
@@ -331,6 +331,7 @@ find_unpacked_entry() {
 ########
 
 track_num=-1
+all_entries=true
 while read row; do
     row_round=$(get_value "$row" round)
     row_author=$(get_value "$row" author)
@@ -422,7 +423,13 @@ while read row; do
                     fatalError "Cannot find any render file"
                 fi
             else
-                fatalError "Cannot find any render file"
+                read -e -p "Rendering this entry has failed, do you wish to skip it [Y/n]? " answer </dev/tty
+                if [[ -z $answer || $answer =~ Y|y ]]; then
+                    all_entries=false
+                    continue
+                else
+                    fatalError "Cannot find any render file"
+                fi
             fi
         fi
     fi
@@ -443,5 +450,10 @@ while read row; do
     rm -r "$tmp_dir"
 done < <(tail -n+2 $METADATA)
 
-infoEcho "All entries have been rendered. You may run"
+if [[ $all_entries == true ]]; then
+    infoEcho "All entries have been rendered. You may run"
+else
+    infoEcho "Some entries are missing!"
+    infoEcho "If you know what you're doing you may still run"
+fi
 infoEcho "./upload-rounds.sh $ROUND"
